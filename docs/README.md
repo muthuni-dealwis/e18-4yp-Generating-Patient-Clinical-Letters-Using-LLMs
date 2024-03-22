@@ -25,9 +25,6 @@ title: Generating Patient Clinical Letters Using LLMs
 #### Table of content
 
 1. [Abstract](#abstract)
-
-   The demand for efficient and accurate healthcare documentation has led to the exploration of novel technologies. This study investigates the use of advanced Language Models (LLMs) for automating the generation of patient clinical letters. Beyond efficiency, we also examine how LLM precision can enhance the clarity of these letters and address concerns related to data privacy within the system. Here we will be training LLMs and evaluating them for their accuracy and clarity, aiming to identify the model that best meets our criteria for generating patient clinical letters efficiently and with improved linguistic precision.
-
 2. [Related works](#related-works)
 3. [Methodology](#methodology)
 4. [Experiment Setup and Implementation](#experiment-setup-and-implementation)
@@ -46,6 +43,8 @@ This is a sample image, to show how to add images to your page. To learn more op
 
 
 ## Abstract
+
+   The demand for efficient and accurate healthcare documentation has led to the exploration of novel technologies. This study investigates the use of advanced Language Models (LLMs) for automating the generation of patient clinical letters. Beyond efficiency, we also examine how LLM precision can enhance the clarity of these letters and address concerns related to data privacy within the system. Here we will be training LLMs and evaluating them for their accuracy and clarity, aiming to identify the model that best meets our criteria for generating patient clinical letters efficiently and with improved linguistic precision.
 
 ## Related works
 
