@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { TextField, Button} from '@mui/material';
 // import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import axios from "axios";
 
 // import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -14,24 +15,35 @@ const DataInputForm: React.FC<any> = (props) =>{
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
     const [input,setInput] = useState('');
-    const [output,setOutput] = useState('');
     const [period,setPeriod] = useState('');
     const [lettertype,setLettertype] = useState('');
+    const [output, setOutput] = useState("");
 
-
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        // setErrors(validation(name, email, password));
+    const handleSubmit = () => {
+        // e.preventDefault();
         console.log(email);
-        // if(errors.name === "" && errors.email === "" && errors.password === ""){
-        //     axios.post('http://localhost:8081/patient_clinical_letters', values)
-        //     .then(result =>{
-        //         console.log(result);
-        //         navigate('/');
+       
+        setOutput("Loading");
 
-        //     })
-        //     .catch(error => console.log(error));
-        // }
+        axios.post('http://localhost:8080/api/home', {
+            patientName: patientname,
+            email: email,
+            period: period,
+            letterType: lettertype
+        })
+        .then(response => {
+            console.log(response.data); // Log the response from the server
+            setOutput(response.data.patientName);
+        })
+        .catch(error => {
+            console.error(error); // Log any errors that occur
+        });
+
+        // fetch("http://localhost:8080/api/home")
+        // .then((response) => response.json())
+        // .then((data) => {
+        //   setOutput(data.message);
+        // });
     }
 
     const handleChange = () => {
@@ -44,7 +56,7 @@ const DataInputForm: React.FC<any> = (props) =>{
             <div className="data-input-form">
                 <h2 className="patient-data-form-heading">Patient Details</h2>
 
-                <form className="patient-data-form" onSubmit={handleSubmit}>
+                <form className="patient-data-form">
                     <Button style={{ marginRight: '10px' }} variant="contained" color="success">
                         Start
                     </Button>
@@ -108,9 +120,9 @@ const DataInputForm: React.FC<any> = (props) =>{
                     </div>
 
                     <div style={{marginTop:'10px',marginLeft: '10px'}}>
-                        <Button variant="contained">
-                            Generate Clinical Letter
-                        </Button>
+                    <Button variant="contained" onClick={handleSubmit}>
+                        Generate Clinical Letter
+                    </Button>
                     </div>            
                 </form>
             </div>
@@ -124,7 +136,7 @@ const DataInputForm: React.FC<any> = (props) =>{
                         label=""
                         value={output}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                        setInput(event.target.value);
+                            setInput(event.target.value);
                         }}
                         fullWidth
                         multiline
@@ -134,29 +146,6 @@ const DataInputForm: React.FC<any> = (props) =>{
             </div>
         </div>
 
-        // <>
-        // <div className="data-input-form">
-        //     <h2  className="patient-data-form-heading">Patient Details</h2>
-
-        //     <form className = "patient-data-form" onSubmit={handleSubmit}>
-        //         <TextField>
-
-        //         </TextField>
-        //     </form>
-        
-        // </div>
-
-        // <div className="data-input-form">
-        //     <h2  className="patient-data-form-heading">Patient History</h2>
-
-        //     <form className = "patient-data-form" onSubmit={handleSubmit}>
-        //         <TextField>
-
-        //         </TextField>
-        //     </form>
-
-        //  </div>
-        // </>
     )
 }
 
