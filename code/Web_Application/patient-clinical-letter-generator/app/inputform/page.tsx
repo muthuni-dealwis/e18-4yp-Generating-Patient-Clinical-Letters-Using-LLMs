@@ -10,6 +10,8 @@ import axios from "axios";
 // import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+import LetterTypeSelect from "../../components/LetterTypeSelect";
+
 const DataInputForm: React.FC<any> = (props) => {
   const [patientname, setPatientname] = useState("");
   const [email, setEmail] = useState("");
@@ -22,7 +24,7 @@ const DataInputForm: React.FC<any> = (props) => {
 
   const [patient, setPatient] = useState("");
   const [micState, setMicState] = useState(true);
-  const [genLetIsClicked, setGenLetIsClicked] = useState(false);
+  // const [genLetIsClicked, setGenLetIsClicked] = useState(false);
   const [voice2TextInput, setVoice2TextInput] = useState("");
   const [output, setOutput] = useState("");
 
@@ -30,14 +32,30 @@ const DataInputForm: React.FC<any> = (props) => {
     setPatient(event.target.value);
   };
 
-  const handleGenLetterClick = () => {
-    setGenLetIsClicked(!genLetIsClicked);
-  };
+  const handleGenLetterClick = async (voice2TextInput: string) => {
+    try {
+      setOutput("Loading ...");
+      const response = await fetch("http://localhost:8080/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt: voice2TextInput }),
+      });
 
-  useEffect(() => {
-    // console.log("genLetIsClicked changed:", genLetIsClicked);
-    setOutput(voice2TextInput);
-  }, [genLetIsClicked]);
+      if (!response.ok) {
+        throw new Error("Failed to send message");
+      }
+
+      const responseData = await response.json();
+      setOutput(responseData.response);
+
+      console.log("Message sent successfully");
+    } catch (error) {
+      console.error("Error:", error);
+      setOutput("Error occured! Try again");
+    }
+  };
 
   const handleSubmit = () => {
     // e.preventDefault();
@@ -45,24 +63,24 @@ const DataInputForm: React.FC<any> = (props) => {
 
     setOutput("Loading");
 
-    const msg =
-      "patientname: " +
-      patientname +
-      "\nletterType: " +
-      lettertype +
-      "\nwrite a clinical letter for the above given cancer patient";
+    // const msg =
+    //   "patientname: " +
+    //   patientname +
+    //   "\nletterType: " +
+    //   lettertype +
+    //   "\nwrite a clinical letter for the above given cancer patient";
 
-    axios
-      .post("http://localhost:8080/api/chat", {
-        prompt: msg,
-      })
-      .then((response) => {
-        console.log(response.data); // Log the response from the server
-        setOutput(response.data.patientName);
-      })
-      .catch((error) => {
-        console.error(error); // Log any errors that occur
-      });
+    // axios
+    //   .post("http://localhost:8080/api/chat", {
+    //     prompt: msg,
+    //   })
+    //   .then((response) => {
+    //     console.log(response.data); // Log the response from the server
+    //     setOutput(response.data.patientName);
+    //   })
+    //   .catch((error) => {
+    //     console.error(error); // Log any errors that occur
+    //   });
 
     // fetch("http://localhost:8080/api/home")
     // .then((response) => response.json())
@@ -75,11 +93,6 @@ const DataInputForm: React.FC<any> = (props) => {
     // setAge(event.target.value);
   };
 
-  const msg =
-    "Lorem ipsum dolor sit, amet consectetur adipisicing elit. Cupiditate voluptatum consequatur magni hic in ipsa neque perspiciatis odit quod soluta consequuntur cum odio reprehenderit praesentium, optio, quia eligendi dignissimos porro. Veniam possimus magnam facere obcaecati fuga, iste temporibus quos necessitatibus ea doloribus velit dolores, rem molestias eaque saepe quis placeat!\n\nLorem ipsum dolor sit, amet consectetur adipisicing elit. Cupiditate voluptatum consequatur magni hic in ipsa neque perspiciatis odit quod soluta consequuntur cum odio reprehenderit praesentium, optio, quia eligendi dignissimos porro. Veniam possimus magnam facere obcaecati fuga, iste temporibus quos necessitatibus ea doloribus velit dolores, rem molestias eaque saepe quis placeat!";
-  // const msg =
-  //   "Dr. Smart\nDoctor's Surgery\nAustralia\n\nSpecialist Clinic\nAustralia\n\nDear Mr. Specialist,\n\nRe: Kevin Hall, 42 Wallaby Way, Sydney\n\nThank you for considering Kevin Hall, a 44-year-old gentleman, for consultation regarding his bone tumor.\n\nMr. Hall presents with a high-grade pleiomorphic leiomyosarcoma, specifically diagnosed as Leiomyosarcoma in the parascapular region.\n\nTreatment: Mr. Hall has undergone a combination of radiotherapy and surgery to address his condition.\n\nCurrent Medications:\nNone\n\nI have advised Mr. Hall regarding his treatment plan and its implications for his ongoing care.\n\nFurthermore, Mr. Hall has undergone investigations to assess his condition and fitness for further interventions, including [please insert relevant investigations].\n\nBased on these findings, I have determined Mr. Hall's current status and recommended course of action.\n\nI kindly request any further guidance or feedback regarding Mr. Hall's condition and treatment plan to ensure optimal management.\n\nRegards,\n\nDr. Smart\nSpecialist\n[Signature]\n[Date]";
-
   return (
     <div className="data-input-container box-border w-full h-screen flex flex-col px-7 md:px-16">
       <div className="menu-bar w-full h-16 text-white">menu-bar</div>
@@ -90,7 +103,7 @@ const DataInputForm: React.FC<any> = (props) => {
               Patient Details
             </div>
             <div className="patient-identity flex w-full mb-7">
-              <div className="patient-input flex flex-grow bg-slate-800 rounded-md">
+              <div className="patient-input flex flex-grow bg-slate-800 rounded-md mr-2">
                 <label
                   htmlFor="patientName"
                   className="font-sans text-slate-300 text-sm px-4 my-auto"
@@ -106,7 +119,7 @@ const DataInputForm: React.FC<any> = (props) => {
                   placeholder={patient ? "" : "type patient name or no..."} // Conditional placeholder
                 />
               </div>
-              <Button
+              {/* <Button
                 style={{
                   marginLeft: "3px",
                   backgroundColor: "#f59e0b",
@@ -117,7 +130,8 @@ const DataInputForm: React.FC<any> = (props) => {
                 // color="success"
               >
                 Search
-              </Button>
+              </Button> */}
+              <LetterTypeSelect />
             </div>
             <div className="voice2text-container relative flex-grow mb-4">
               {/* <div
@@ -136,13 +150,15 @@ const DataInputForm: React.FC<any> = (props) => {
                   onChange={(e) => setVoice2TextInput(e.target.value)}
                 />
               </div>
-              <div
-                className={`controllers ${
-                  micState ? "bg-green-500" : "bg-red-500"
-                } w-14 h-10 rounded-2xl absolute flex justify-center items-center shadow-lg`}
-                onClick={() => setMicState(!micState)}
-              >
-                {micState ? <MicIcon /> : <MicOffIcon />}
+              <div className="voice2text-controllers absolute flex flex-row">
+                <div
+                  className={`${
+                    micState ? "bg-green-500" : "bg-red-500"
+                  } w-14 h-10 rounded-2xl flex justify-center items-center shadow-lg`}
+                  onClick={() => setMicState(!micState)}
+                >
+                  {micState ? <MicIcon /> : <MicOffIcon />}
+                </div>
               </div>
               {/* <div
                 className={`gen-letter bg-sky-500 w-fit h-10 px-5 rounded-2xl absolute flex justify-center items-center shadow-lg border border-sky-600 transition duration-300 ${
@@ -156,15 +172,33 @@ const DataInputForm: React.FC<any> = (props) => {
                 className="gen-letter bg-sky-500 w-fit h-10 px-5 rounded-2xl absolute flex justify-center 
                 items-center shadow-lg border border-sky-500 text-white font-sans font-medium hover:bg-sky-600 
                 hover:text-white hover:border-sky-600 active:bg-sky-700 active:text-white active:border-sky-800"
-                onClick={handleGenLetterClick}
+                onClick={() => handleGenLetterClick(voice2TextInput)}
               >
-                Generate Patient Clinical Letter
+                <label>Generate Patient Clinical Letter</label>
               </div>
             </div>
           </div>
-          <div className="data-input-form flex-grow flex-grow-0 h-1/5">
+          <div className="data-input-form flex flex-grow flex-grow-0 flex-col h-1/5">
             <div className="font-sans text-lg font-medium tracking-wide ml-3 h-12">
               Patient History
+            </div>
+            <div className="period-select flex-glow bg-slate-500 w-full h-full flex items-center justify-center rounded-md py-5">
+              <label className="font-sans font-medium tracking-wide pr-5">
+                Period
+              </label>
+              <LetterTypeSelect />
+              <Button
+                style={{
+                  marginLeft: "8px",
+                  backgroundColor: "#f59e0b",
+                  padding: "0 10px",
+                  textTransform: "capitalize",
+                }}
+                variant="contained"
+                // color="success"
+              >
+                Previous Diagnosis and Symptoms
+              </Button>
             </div>
           </div>
         </div>
@@ -172,11 +206,23 @@ const DataInputForm: React.FC<any> = (props) => {
           <div className="font-sans text-lg font-medium tracking-wide ml-3 h-12">
             Output
           </div>
-          <div
+          {/* <div
             className="output-container overflow-auto font-sans font-medium text-sm text-slate-300 flex-grow bg-slate-800 rounded-md px-4 py-7 text-justify"
             style={{ whiteSpace: "pre-line" }}
           >
             {output}
+          </div> */}
+          <div className="output-container relative flex-grow">
+            <div className="relative h-full overflow-hidden font-sans font-medium text-sm text-slate-300 bg-slate-800 rounded-md">
+              <textarea
+                className="absolute inset-0 w-full h-full bg-transparent px-4 py-7 text-justify resize-none"
+                style={{ whiteSpace: "pre-line" }}
+                value={output}
+                placeholder="Here is your output will be shown ..."
+                onChange={(e) => setOutput(e.target.value)}
+                disabled
+              />
+            </div>
           </div>
         </div>
       </div>

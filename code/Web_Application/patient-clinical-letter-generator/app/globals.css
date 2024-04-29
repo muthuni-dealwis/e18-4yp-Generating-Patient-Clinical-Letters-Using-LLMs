@@ -137,9 +137,23 @@ button {
   color: #7439db;
 }
 
-.controllers {
+#letter-type-select {
+  /* background-color: #000;
+  color: white; */
+  font-size: 14px;
+  width: 85px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.voice2text-controllers {
   top: -15px;
   left: 18px;
+}
+
+.output-controllers {
+  top: -15px;
+  right: 30px;
 }
 
 .gen-letter {

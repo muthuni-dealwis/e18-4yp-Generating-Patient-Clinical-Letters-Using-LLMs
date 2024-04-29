@@ -27,17 +27,17 @@ def chat():
     # Get the user input from the request
     prompt = request.json.get('prompt')
 
-    # # Call the OLLAMA chat function
-    # stream = ollama.chat(
-    #     model='llama3',
-    #     messages=[{'role': 'user', 'content': prompt}],
-    #     stream=True,
-    # )
+    # Call the OLLAMA chat function
+    stream = ollama.chat(
+        model='llama3',
+        messages=[{'role': 'user', 'content': prompt}],
+        stream=True,
+    )
 
-    # # Process the stream and construct the response
-    # response = ''.join(chunk['message']['content'] for chunk in stream)
+    # Process the stream and construct the response
+    response = ''.join(chunk['message']['content'] for chunk in stream)
 
-    return jsonify({'response': prompt})
+    return jsonify({'response': response})
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)
