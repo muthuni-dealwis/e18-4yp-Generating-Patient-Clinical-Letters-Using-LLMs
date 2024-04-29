@@ -66,10 +66,11 @@ const Home: React.FC<any> = (props) =>{
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="auth-form-container">
-        <h1 className="login-register-heading">Login</h1>
+        <label className="login-register-heading font-sans text-slate-200 font-medium mb-9 tracking-wider">Login</label>
         <form className="login-form" onSubmit={handleSubmit}>
-          <label htmlFor="email">Email</label>
+          <label htmlFor="email" className="font-sans text-slate-200 font-normal mb-1">Email</label>
           <input
+            className="h-9 bg-slate-300 opacity-95 rounded px-4 font-sans font-normal placeholder-gray-500 text-slate-800 mb-4"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             type="email"
@@ -79,8 +80,9 @@ const Home: React.FC<any> = (props) =>{
           />
           {errors.email &&  <span className='text-danger'> {errors.email} </span>}
 
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password" className="font-sans text-slate-200 font-normal mb-1">Password</label>
           <input
+            className="h-9 bg-slate-300 opacity-95 rounded px-4 font-sans font-normal placeholder-gray-500 text-slate-800"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             type="password"
@@ -92,7 +94,7 @@ const Home: React.FC<any> = (props) =>{
 
 
           <Link href =  "/inputform">
-            <button className="linkSubmit" type="submit">Log In</button>
+            <button className="linkSubmit mt-10 bg-violet-500 font-sans font-medium text-white tracking-widest" type="submit">Login</button>
           </Link>
           
         </form>

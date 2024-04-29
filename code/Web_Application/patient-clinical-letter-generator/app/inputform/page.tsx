@@ -6,6 +6,7 @@ import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 // import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import axios from "axios";
+import Link from 'next/link';
 
 // import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -94,8 +95,16 @@ const DataInputForm: React.FC<any> = (props) => {
   };
 
   return (
-    <div className="data-input-container box-border w-full h-screen flex flex-col px-7 md:px-16">
-      <div className="menu-bar w-full h-16 text-white">menu-bar</div>
+    <div className="data-input-container box-border w-full h-screen flex flex-col px-7 md:px-16 py-2">
+      <div className="menu-bar w-full px-1 h-16 text-white flex flex-row place-content-between pt-2 mb-3">
+        <div className="data-time-show bg-slate-500 h-fit px-5 py-1 rounded-md">Date : 29/04/2024</div>
+        <div className="right-menu-items h-fit w-fit flex flex-row">
+          <div className="user-name bg-slate-500 px-5 py-1 rounded-md mr-5">Settings</div>
+          <Link href = "/">
+            <div className="user-name bg-slate-500 px-5 py-1 rounded-md">Logout</div>
+          </Link>
+        </div>
+      </div>
       <div className="flex flex-col md:flex-row h-full pb-7">
         <div className="box w-full md:w-1/2 h-full md:mr-4 flex flex-col">
           <div className="data-input-form mb-3 flex flex-col flex-grow h-4/5">
