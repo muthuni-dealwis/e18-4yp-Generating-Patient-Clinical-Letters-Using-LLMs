@@ -61,29 +61,29 @@ body {
   background-color: #9AC5F4;
   padding: 1em;
   border: 1px solid #132043;
-  width: 650px;
-  height: 600px;
+  /* width: 650px;
+  height: 600px; */
   border-radius: 15px;
   opacity: 0.7;
 
 }
 
-.patient-data-form-heading{
+/* .patient-data-form-heading{
   text-align: left;
   font-size: 1rem;
   font-weight: bold;
   margin-bottom: 10px;
-}
+} */
 
 .patient-data-form{
   padding: 1em;
 }
 
-.data-input-container {
+/* .data-input-container {
   display: grid;
-  grid-template-columns: repeat(2, 1fr); /* Two columns with equal width */
-  gap: 20px; /* Space between columns */
-}
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+} */
 
 
 @media screen and (min-width: 600px) {
@@ -95,7 +95,7 @@ body {
   }
 }
 
-label {
+/* label {
   text-align: left;
   padding: 0.25rem 0;
 }
@@ -105,6 +105,27 @@ input {
   padding: 1rem;
   border: none;
   border-radius: 10px;
+} */
+
+.patient-identity label {
+  font-size: 14px;
+}
+
+.patientName-input {
+  font-size: 14px;
+  color: #000; /* Typing color */
+  padding: 4px 8px;
+  border: none;
+  border-radius: 5px;
+  /* width: 100%; */
+}
+
+.patientName-input:hover {
+  border-color: #000;
+}
+
+::placeholder {
+  color: #aaa;
 }
 
 button {
@@ -114,6 +135,30 @@ button {
   border-radius: 10px;
   cursor: pointer;
   color: #7439db;
+}
+
+#letter-type-select {
+  /* background-color: #000;
+  color: white; */
+  font-size: 14px;
+  width: 85px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.voice2text-controllers {
+  top: -15px;
+  left: 18px;
+}
+
+.output-controllers {
+  top: -15px;
+  right: 30px;
+}
+
+.gen-letter {
+  bottom: -15px;
+  right: 18px;
 }
 
 .link-btn {
