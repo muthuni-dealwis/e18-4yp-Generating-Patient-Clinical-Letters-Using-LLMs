@@ -1,0 +1,12 @@
+
+.background {
+    background-image: url('/images/YP_HomePage.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }

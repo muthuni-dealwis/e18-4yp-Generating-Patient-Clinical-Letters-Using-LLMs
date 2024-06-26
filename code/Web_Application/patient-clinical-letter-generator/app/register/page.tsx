@@ -3,6 +3,10 @@
 import React, { useState } from "react";
 import { TextField, Button } from '@mui/material';
 import Link from 'next/link';
+import {useRouter} from "next/navigation";
+import { toast } from "react-hot-toast";
+import HomeIcon from "@/components/HomeNavigator";
+
 
 const RegisterPage: React.FC<any> = (props) =>{
 
@@ -10,24 +14,41 @@ const RegisterPage: React.FC<any> = (props) =>{
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, setErrors] = useState({});
+    const [response, setResponse] = useState('');
+    const router = useRouter(); 
 
+    const handleSubmit = async () => {
+        event.preventDefault();
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        // setErrors(validation(name, email, password));
-        console.log(email);
-        // if(errors.name === "" && errors.email === "" && errors.password === ""){
-        //     axios.post('http://localhost:8081/patient_clinical_letters', values)
-        //     .then(result =>{
-        //         console.log(result);
-        //         navigate('/');
+        try {
+            const response = await fetch("http://localhost:8080/api/signup", {
+                method: "POST",
+                headers: {"Content-Type": "application/json",},
+                body: JSON.stringify({ name, password, email }),
+            });
 
-        //     })
-        //     .catch(error => console.log(error));
-        // }
+            const responseData = await response.json();
+            if (!response.ok) {
+                toast.error("Error occured");
+                throw new Error("Failed to send message");
+                
+            }
+            // console.log("Login success", response.json);
+            router.push("/inputform");
+          } catch (error:any) {
+              console.log("Login failed", error.message);
+          } finally{
+          }
     }
 
     return(
+        <div>
+         <div className="flex justify-end">
+        <div className="text-white font-bold">
+            <HomeIcon/>
+        </div>
+        </div>
+        
         <div className="auth-form-container">
             <label className="login-register-heading font-sans text-slate-200 font-medium mb-9 tracking-wider">Register</label>
 
@@ -63,15 +84,18 @@ const RegisterPage: React.FC<any> = (props) =>{
                 name="password" />
             {/* {errors.password && <span className='text-danger'> {errors.password} </span>} */}
 
-            <Link href = "/">
+            {/* <Link href = "/">
                 <button  className="linkSubmit mt-10 bg-violet-500 font-sans font-medium text-white tracking-widest" type="submit">Register</button>
-            </Link>  
+            </Link>   */}
+
+            <button  className="linkSubmit mt-10 bg-violet-500 font-sans font-medium text-white tracking-widest" type="submit" >Register</button>
         </form>
 
-        <Link href = "/">
+        <Link href = "/login">
             <button className="link-btn">Already have an account? Login here.</button>
         </Link>
         
+    </div>
     </div>
     )
 }
