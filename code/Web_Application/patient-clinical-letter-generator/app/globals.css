@@ -7,25 +7,6 @@
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
 }
-/* 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-} */
-
 
 html, body, .App {
   margin: 0;
@@ -39,6 +20,10 @@ body {
   justify-content: center;
   align-items: center;
   background-image: linear-gradient(79deg, #030637, #04364A 48%, #3C0753);
+}
+
+.custom-datepicker {
+  width: 110px; /* Adjust the width as needed */
 }
 
 .App {
@@ -61,30 +46,14 @@ body {
   background-color: #9AC5F4;
   padding: 1em;
   border: 1px solid #132043;
-  /* width: 650px;
-  height: 600px; */
   border-radius: 15px;
   opacity: 0.7;
 
 }
 
-/* .patient-data-form-heading{
-  text-align: left;
-  font-size: 1rem;
-  font-weight: bold;
-  margin-bottom: 10px;
-} */
-
 .patient-data-form{
   padding: 1em;
 }
-
-/* .data-input-container {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-} */
-
 
 @media screen and (min-width: 600px) {
   .auth-form-container {
@@ -94,18 +63,6 @@ body {
     margin: 0.5rem;
   }
 }
-
-/* label {
-  text-align: left;
-  padding: 0.25rem 0;
-}
-
-input {
-  margin: 0.5rem 0;
-  padding: 1rem;
-  border: none;
-  border-radius: 10px;
-} */
 
 .patient-identity label {
   font-size: 14px;
@@ -117,7 +74,6 @@ input {
   padding: 4px 8px;
   border: none;
   border-radius: 5px;
-  /* width: 100%; */
 }
 
 .patientName-input:hover {
@@ -138,8 +94,6 @@ button {
 }
 
 #letter-type-select {
-  /* background-color: #000;
-  color: white; */
   font-size: 14px;
   width: 85px;
   padding-top: 0;
