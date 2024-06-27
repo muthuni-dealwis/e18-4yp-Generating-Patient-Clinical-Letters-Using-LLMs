@@ -6,14 +6,16 @@ import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 // import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import axios from "axios";
-import Link from 'next/link';
+import Link from "next/link";
 import MyDatePicker from "@/components/DatePicker";
 
 // import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import LetterTypeSelect from "../../components/LetterTypeSelect";
-import { jsPDF } from 'jspdf';
+import { jsPDF } from "jspdf";
+
+import "./loadIcon.css";
 
 const DataInputForm: React.FC<any> = (props) => {
   const [patientname, setPatientname] = useState("");
@@ -30,39 +32,99 @@ const DataInputForm: React.FC<any> = (props) => {
   // const [genLetIsClicked, setGenLetIsClicked] = useState(false);
   const [voice2TextInput, setVoice2TextInput] = useState("");
   const [output, setOutput] = useState("");
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleNameChange = (event: any) => {
     setPatient(event.target.value);
   };
 
+  // const handleGenLetterClick = async (voice2TextInput: string) => {
+  //   try {
+  //     setOutput("Loading ...");
+  //     const response = await fetch("http://localhost:8080/api/chat", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ prompt: voice2TextInput }),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error("Failed to send message");
+  //     }
+
+  //     const responseData = await response.json();
+  //     setOutput(responseData.response);
+  //     setText(responseData.response);
+
+  //     console.log("Message sent successfully");
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //     setOutput("Error occured! Try again");
+  //   }
+  // };
+
   const handleGenLetterClick = async (voice2TextInput: string) => {
     try {
-      setOutput("Loading ...");
-      const response = await fetch("http://localhost:8080/api/chat", {
+      setLoading(true);
+      setOutput("");
+      const response = await fetch("http://localhost:5050/api/generate", {
+        //ollama serve api
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ prompt: voice2TextInput }),
+        body: JSON.stringify({
+          model: "llama3-ft", //set ollama model
+          prompt: voice2TextInput,
+        }),
       });
 
-      if (!response.ok) {
+      if (!response.ok || !response.body) {
         throw new Error("Failed to send message");
       }
 
-      const responseData = await response.json();
-      setOutput(responseData.response);
-      setText(responseData.response);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let result = "";
+      let firstWordShown = false;
 
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        result += decoder.decode(value, { stream: true });
+
+        const lines = result.split("\n");
+        result = lines.pop() || "";
+
+        for (const line of lines) {
+          if (line) {
+            const parsed = JSON.parse(line);
+            if (parsed.done) break;
+            if (!firstWordShown) {
+              setLoading(false);
+              firstWordShown = true;
+            }
+            setOutput((prev) => prev + parsed.response);
+          }
+        }
+      }
+
+      if (!firstWordShown) {
+        setLoading(false);
+      }
+
+      setOutput((prev) => prev + result);
       console.log("Message sent successfully");
     } catch (error) {
       console.error("Error:", error);
+      setLoading(false);
       setOutput("Error occured! Try again");
     }
   };
 
-  const downloadClinicalLetter = ()=>{
+  const downloadClinicalLetter = () => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
     const margin = 10;
@@ -84,8 +146,8 @@ const DataInputForm: React.FC<any> = (props) => {
       }
     });
 
-    doc.save('generated.pdf');
-  }
+    doc.save("generated.pdf");
+  };
 
   const handleSubmit = () => {
     console.log(email);
@@ -100,11 +162,17 @@ const DataInputForm: React.FC<any> = (props) => {
   return (
     <div className="data-input-container box-border w-full h-screen flex flex-col px-7 md:px-16 py-2">
       <div className="menu-bar w-full px-1 h-16 text-white flex flex-row place-content-between pt-2 mb-3">
-        <div><MyDatePicker /></div>
+        <div>
+          <MyDatePicker />
+        </div>
         <div className="right-menu-items h-fit w-fit flex flex-row">
-          <div className="user-name bg-slate-500 px-5 py-1 rounded-md mr-5">Settings</div>
-          <Link href = "/">
-            <div className="user-name bg-slate-500 px-5 py-1 rounded-md">Logout</div>
+          <div className="user-name bg-slate-500 px-5 py-1 rounded-md mr-5">
+            Settings
+          </div>
+          <Link href="/">
+            <div className="user-name bg-slate-500 px-5 py-1 rounded-md">
+              Logout
+            </div>
           </Link>
         </div>
       </div>
@@ -192,23 +260,37 @@ const DataInputForm: React.FC<any> = (props) => {
           </div>
           <div className="output-container relative flex-grow">
             <div className="relative h-full overflow-hidden font-sans font-medium text-sm text-slate-300 bg-slate-800 rounded-md">
-              <textarea
-                className="absolute inset-0 w-full h-full bg-transparent px-4 py-7 text-justify resize-none"
-                style={{ whiteSpace: "pre-line" }}
-                value={output}
-                placeholder="Here is your output will be shown ..."
-                onChange={(e) => setOutput(e.target.value)}
-                disabled
-              />
+              {loading ? (
+                <>
+                  <div className="w-full h-full flex items-center justify-center">
+                    <div className="lds-facebook">
+                      <div></div>
+                      <div></div>
+                      <div></div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <textarea
+                    className="absolute inset-0 w-full h-full bg-transparent px-4 py-7 text-justify resize-none"
+                    style={{ whiteSpace: "pre-line" }}
+                    value={output}
+                    placeholder="Here is your output will be shown ..."
+                    onChange={(e) => setOutput(e.target.value)}
+                    disabled
+                  />
+                </>
+              )}
             </div>
             <div
-                className="gen-letter bg-sky-500 w-fit h-8 px-5 rounded-2xl absolute flex justify-center 
+              className="gen-letter bg-sky-500 w-fit h-8 px-5 rounded-2xl absolute flex justify-center 
                 items-center shadow-lg border border-sky-500 text-white font-sans font-medium hover:bg-sky-600 
                 hover:text-white hover:border-sky-600 active:bg-sky-700 active:text-white active:border-sky-800"
-                onClick={() => downloadClinicalLetter()}
-              >
-                <label>Download Letter</label>
-              </div>
+              onClick={() => downloadClinicalLetter()}
+            >
+              <label>Download Letter</label>
+            </div>
           </div>
         </div>
       </div>
