@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, useRadioGroup } from "@mui/material";
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 // import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -11,11 +11,13 @@ import MyDatePicker from "@/components/DatePicker";
 
 // import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-import LetterTypeSelect from "../../components/LetterTypeSelect";
 import { jsPDF } from "jspdf";
 
+import LetterTypeSelect from "@/components/LetterTypeSelect";
+import PatientSearchBar from "@/components/PatientSearchBar";
+
 import "./loadIcon.css";
+import "./inputForm.css";
 
 const DataInputForm: React.FC<any> = (props) => {
   const [patientname, setPatientname] = useState("");
@@ -24,10 +26,7 @@ const DataInputForm: React.FC<any> = (props) => {
   const [errors, setErrors] = useState({});
   const [input, setInput] = useState("");
   const [period, setPeriod] = useState("");
-  const [lettertype, setLettertype] = useState("");
-  // const [output, setOutput] = useState("");
 
-  const [patient, setPatient] = useState("");
   const [micState, setMicState] = useState(true);
   // const [genLetIsClicked, setGenLetIsClicked] = useState(false);
   const [voice2TextInput, setVoice2TextInput] = useState("");
@@ -35,9 +34,12 @@ const DataInputForm: React.FC<any> = (props) => {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleNameChange = (event: any) => {
-    setPatient(event.target.value);
-  };
+  const [letterType, setLetterType] = useState("Discharge");
+  const [patient, setPatient] = useState("");
+
+  // useEffect(() => {
+  //   console.log(patient);
+  // }, [patient]);
 
   // const handleGenLetterClick = async (voice2TextInput: string) => {
   //   try {
@@ -149,16 +151,6 @@ const DataInputForm: React.FC<any> = (props) => {
     doc.save("generated.pdf");
   };
 
-  const handleSubmit = () => {
-    console.log(email);
-
-    setOutput("Loading");
-  };
-
-  const handleChange = () => {
-    // setAge(event.target.value);
-  };
-
   return (
     <div className="data-input-container box-border w-full h-screen flex flex-col px-7 md:px-16 py-2">
       <div className="menu-bar w-full px-1 h-16 text-white flex flex-row place-content-between pt-2 mb-3">
@@ -183,23 +175,11 @@ const DataInputForm: React.FC<any> = (props) => {
               Patient Details
             </div>
             <div className="patient-identity flex w-full mb-7">
-              <div className="patient-input flex flex-grow bg-slate-800 rounded-md mr-2">
-                <label
-                  htmlFor="patientName"
-                  className="font-sans text-slate-300 text-sm px-4 my-auto"
-                >
-                  Patient Name/No
-                </label>
-                <input
-                  type="text"
-                  id="patientName"
-                  className="patientName-input flex-grow"
-                  value={patient}
-                  onChange={handleNameChange}
-                  placeholder={patient ? "" : "type patient name or no..."} // Conditional placeholder
-                />
-              </div>
-              <LetterTypeSelect />
+              <PatientSearchBar patient={patient} setPatient={setPatient} />
+              <LetterTypeSelect
+                letterType={letterType}
+                setLetterType={setLetterType}
+              />
             </div>
             <div className="voice2text-container relative flex-grow mb-4">
               <div className="relative h-full overflow-hidden font-sans font-medium text-sm text-slate-300 bg-slate-700 rounded-md">
@@ -239,7 +219,7 @@ const DataInputForm: React.FC<any> = (props) => {
               <label className="font-sans font-medium tracking-wide pr-5">
                 Period
               </label>
-              <LetterTypeSelect />
+              {/* <LetterTypeSelect /> */}
               <Button
                 style={{
                   marginLeft: "8px",

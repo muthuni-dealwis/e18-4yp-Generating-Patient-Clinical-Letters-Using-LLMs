@@ -10,12 +10,12 @@ app = Flask(__name__)
 CORS(app)
 
 
-mydb = mysql.connector.connect(
-    host = "localhost",
-    user = "root",
-    password = "",
-    database = "fyp",
-)
+# mydb = mysql.connector.connect(
+#     host = "localhost",
+#     user = "root",
+#     password = "",
+#     database = "fyp",
+# )
 
 # /api/home
 @app.route("/api/home", methods=['GET'])
@@ -94,6 +94,22 @@ def login():
     mycursor.close()
 
     return jsonify({"message": "Login successful"}), 200
+
+@app.route("/api/names", methods=['GET'])
+def return_names():
+    demo_names = [
+        "Alice", "Bob", "Charlie", "David", "Emma",
+        "Frank", "Grace", "Henry", "Ivy", "Jack",
+        "Kate", "Liam", "Mia", "Noah", "Olivia",
+        "Peter", "Quinn", "Rose", "Sam", "Tina"
+    ]
+
+    # Ensure the array has exactly 20 elements
+    demo_names = demo_names[:20]
+
+    return jsonify({
+        'names': demo_names
+    })
 
 if __name__ == "__main__":
     app.run(debug=True, port=8080)
