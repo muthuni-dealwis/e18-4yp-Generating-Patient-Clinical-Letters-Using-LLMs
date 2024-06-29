@@ -18,6 +18,7 @@ import PatientSearchBar from "@/components/PatientSearchBar";
 
 import "./loadIcon.css";
 import "./inputForm.css";
+import PatientSearchResults from "@/components/PatientSearchResults";
 
 const DataInputForm: React.FC<any> = (props) => {
   const [patientname, setPatientname] = useState("");
@@ -35,11 +36,11 @@ const DataInputForm: React.FC<any> = (props) => {
   const [loading, setLoading] = useState(false);
 
   const [letterType, setLetterType] = useState("Discharge");
-  const [patient, setPatient] = useState("");
+  const [patientsSearched, setPatientsSearched] = useState({});
 
-  // useEffect(() => {
-  //   console.log(patient);
-  // }, [patient]);
+  useEffect(() => {
+    console.log(patientsSearched);
+  }, [patientsSearched]);
 
   // const handleGenLetterClick = async (voice2TextInput: string) => {
   //   try {
@@ -175,7 +176,16 @@ const DataInputForm: React.FC<any> = (props) => {
               Patient Details
             </div>
             <div className="patient-identity flex w-full mb-7">
-              <PatientSearchBar patient={patient} setPatient={setPatient} />
+              <label
+                htmlFor="patientName"
+                className="flex items-center rounded-l-md font-sans text-slate-300 text-sm px-4 my-auto bg-slate-800 h-full"
+              >
+                Patient Name/No
+              </label>
+              <div className="search-bar-container relative flex flex-grow flex-col">
+                <PatientSearchBar setPatientsSearched={setPatientsSearched} />
+                <PatientSearchResults patientsSearched={patientsSearched} />
+              </div>
               <LetterTypeSelect
                 letterType={letterType}
                 setLetterType={setLetterType}

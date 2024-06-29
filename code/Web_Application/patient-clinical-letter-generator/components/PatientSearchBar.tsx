@@ -1,43 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface Props {
-  patient: string;
-  setPatient: React.Dispatch<React.SetStateAction<string>>;
+  setPatientsSearched: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const PatientSearchBar: React.FC<Props> = ({ patient, setPatient }) => {
+const PatientSearchBar: React.FC<Props> = ({ setPatientsSearched }) => {
+  const [input, setInput] = useState("");
+
   const fetchData = async (value: string) => {
-    const response = await fetch("http://127.0.0.1:8080/api/names");
-    const json = await response.json();
-    const results = json.names.filter(
-      (name: string) =>
-        value && name.toLowerCase().includes(value.trim().toLowerCase())
-    );
-    console.log(results);
+    const response = await fetch("http://localhost:8080/api/search", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: value,
+      }),
+    });
+
+    const results = await response.json();
+    setPatientsSearched(results);
   };
 
   const handleChange = (value: string) => {
-    setPatient(value);
+    setInput(value);
     fetchData(value);
   };
 
   return (
-    <div className="patient-input flex flex-grow bg-slate-800 rounded-md mr-2">
-      <label
-        htmlFor="patientName"
-        className="font-sans text-slate-300 text-sm px-4 my-auto"
-      >
-        Patient Name/No
-      </label>
+    <div className="relative flex flex-grow rounded-r-md bg-slate-800 mr-2">
       <input
         type="text"
         id="patientName"
-        className="patientName-input flex-grow"
-        value={patient}
+        className="patientName-input flex-grow rounded-md"
+        value={input}
         onChange={(event) => {
           handleChange(event.target.value);
         }}
-        placeholder={patient ? "" : "type patient name or no..."} // Conditional placeholder
+        placeholder={input ? "" : "type patient name or no..."} // Conditional placeholder
       />
     </div>
   );

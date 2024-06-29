@@ -10,12 +10,28 @@ app = Flask(__name__)
 CORS(app)
 
 
-# mydb = mysql.connector.connect(
-#     host = "localhost",
-#     user = "root",
-#     password = "",
-#     database = "fyp",
-# )
+mydb = mysql.connector.connect(
+    host = "localhost",
+    user = "root",
+    password = "",
+    database = "fyp",
+)
+
+# Global variable to store patient data
+patient_data = {}
+
+def fetch_patient_data():
+    """
+    Fetch all patient IDs and patient names from the patient table
+    and store them in the global patient_data dictionary.
+    """
+    global patient_data
+    mycursor = mydb.cursor(dictionary=True)
+    mycursor.execute("SELECT patient_id, patient_name FROM patient")
+    patients = mycursor.fetchall()
+    mycursor.close()
+    
+    patient_data = {patient['patient_id']: patient['patient_name'] for patient in patients}
 
 # /api/home
 @app.route("/api/home", methods=['GET'])
@@ -111,5 +127,19 @@ def return_names():
         'names': demo_names
     })
 
+@app.route('/api/search', methods=['POST'])
+def search_patients():
+    query = request.json.get('query', '').lower()
+    if not query:
+        return jsonify({"error": "No query provided"}), 400
+
+    matched_patients = {pid: name for pid, name in patient_data.items() if query in str(pid).lower() or query in name.lower()}
+    
+    if not matched_patients:
+        return jsonify({"error": "No match found"}), 404
+
+    return jsonify(matched_patients)
+
 if __name__ == "__main__":
+    fetch_patient_data()
     app.run(debug=True, port=8080)
