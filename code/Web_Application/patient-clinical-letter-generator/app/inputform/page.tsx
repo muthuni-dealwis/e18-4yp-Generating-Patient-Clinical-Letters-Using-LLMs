@@ -35,12 +35,14 @@ const DataInputForm: React.FC<any> = (props) => {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [searchBarInput, setSearchBarInput] = useState("");
   const [letterType, setLetterType] = useState("Discharge");
   const [patientsSearched, setPatientsSearched] = useState({});
+  const [searchResultListOpened, setSearchResultListOpened] = useState(false);
 
   useEffect(() => {
-    console.log(patientsSearched);
-  }, [patientsSearched]);
+    console.log(searchBarInput);
+  }, [searchBarInput]);
 
   // const handleGenLetterClick = async (voice2TextInput: string) => {
   //   try {
@@ -183,8 +185,24 @@ const DataInputForm: React.FC<any> = (props) => {
                 Patient Name/No
               </label>
               <div className="search-bar-container relative flex flex-grow flex-col">
-                <PatientSearchBar setPatientsSearched={setPatientsSearched} />
-                <PatientSearchResults patientsSearched={patientsSearched} />
+                <PatientSearchBar
+                  searchBarInput={searchBarInput}
+                  setSearchBarInput={setSearchBarInput}
+                  setPatientsSearched={setPatientsSearched}
+                  setSearchResultListOpened={setSearchResultListOpened}
+                />
+                {searchResultListOpened ? (
+                  <>
+                    <PatientSearchResults
+                      patientsSearched={patientsSearched}
+                      setPatientsSearched={setPatientsSearched}
+                      setSearchResultListOpened={setSearchResultListOpened}
+                      setSearchBarInput={setSearchBarInput}
+                    />
+                  </>
+                ) : (
+                  <></>
+                )}
               </div>
               <LetterTypeSelect
                 letterType={letterType}

@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React from "react";
 
 interface Props {
-  setPatientsSearched: React.Dispatch<React.SetStateAction<string>>;
+  searchBarInput: string;
+  setSearchBarInput: React.Dispatch<React.SetStateAction<string>>;
+  setPatientsSearched: React.Dispatch<React.SetStateAction<object>>;
+  setSearchResultListOpened: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const PatientSearchBar: React.FC<Props> = ({ setPatientsSearched }) => {
-  const [input, setInput] = useState("");
-
+const PatientSearchBar: React.FC<Props> = ({
+  searchBarInput,
+  setSearchBarInput,
+  setPatientsSearched,
+  setSearchResultListOpened,
+}) => {
   const fetchData = async (value: string) => {
     const response = await fetch("http://localhost:8080/api/search", {
       method: "POST",
@@ -23,7 +29,7 @@ const PatientSearchBar: React.FC<Props> = ({ setPatientsSearched }) => {
   };
 
   const handleChange = (value: string) => {
-    setInput(value);
+    setSearchBarInput(value);
     fetchData(value);
   };
 
@@ -33,11 +39,14 @@ const PatientSearchBar: React.FC<Props> = ({ setPatientsSearched }) => {
         type="text"
         id="patientName"
         className="patientName-input flex-grow rounded-md"
-        value={input}
+        value={searchBarInput}
         onChange={(event) => {
           handleChange(event.target.value);
         }}
-        placeholder={input ? "" : "type patient name or no..."} // Conditional placeholder
+        onFocus={() => {
+          setSearchResultListOpened(true);
+        }}
+        placeholder={searchBarInput ? "" : "type patient name or no..."} // Conditional placeholder
       />
     </div>
   );
