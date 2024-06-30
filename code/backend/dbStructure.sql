@@ -1,10 +1,10 @@
-CREATE DATABASE fyp
+CREATE DATABASE fyp;
 
-USE fyp
+USE fyp;
 
 CREATE TABLE User (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50);
+    name VARCHAR(50),
     email VARCHAR(30),
     password VARCHAR(255)
 );
