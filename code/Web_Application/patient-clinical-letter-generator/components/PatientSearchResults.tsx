@@ -3,11 +3,20 @@ import "./PatientSearchResults.css";
 import QueuePlayNextIcon from "@mui/icons-material/QueuePlayNext";
 import UpdateIcon from "@mui/icons-material/Update";
 
+interface PatientDetails {
+  patient_id: number;
+  patient_name: string;
+  birthdate: string;
+}
+
 interface Props {
   patientsSearched: Record<number, string>;
   setPatientsSearched: React.Dispatch<React.SetStateAction<object>>;
   setSearchResultListOpened: React.Dispatch<React.SetStateAction<boolean>>;
   setSearchBarInput: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedPatientDetails: React.Dispatch<
+    React.SetStateAction<PatientDetails>
+  >;
 }
 
 const PatientSearchResults: React.FC<Props> = ({
@@ -15,15 +24,29 @@ const PatientSearchResults: React.FC<Props> = ({
   setPatientsSearched,
   setSearchResultListOpened,
   setSearchBarInput,
+  setSelectedPatientDetails,
 }) => {
   const node = useRef<HTMLDivElement>(null);
   const [hoveredItem, setHoveredItem] = useState<number | null>(null);
 
-  const handleListItemClick = (key: number) => {
+  const handleListItemClick = async (key: number) => {
     setSearchBarInput(patientsSearched[key]);
     setSearchResultListOpened(false);
     setPatientsSearched({});
+
     //add patient data fetching api
+    const response = await fetch("http://localhost:8080/api/patient-details", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        patient_id: key,
+      }),
+    });
+
+    const results = await response.json();
+    setSelectedPatientDetails(results);
   };
 
   useEffect(() => {
@@ -92,7 +115,7 @@ const PatientSearchResults: React.FC<Props> = ({
         })}
       </div>
       <div
-        className="addPatient px-3 py-2 border-t-2 border-slate-500 text-sm cursor-pointer"
+        className="addPatient px-3 py-1 border-t-2 border-slate-500 text-sm cursor-pointer"
         onClick={() => {
           alert("add new patient");
         }}

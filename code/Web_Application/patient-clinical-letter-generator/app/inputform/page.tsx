@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { TextField, Button, useRadioGroup } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
+import Image from "next/image";
 
 import MicIcon from "@mui/icons-material/Mic";
 import StopRoundedIcon from "@mui/icons-material/StopRounded";
@@ -11,6 +12,8 @@ import DriveFileRenameOutlineRoundedIcon from "@mui/icons-material/DriveFileRena
 import AutoFixHighRoundedIcon from "@mui/icons-material/AutoFixHighRounded";
 import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
 import CleaningServicesRoundedIcon from "@mui/icons-material/CleaningServicesRounded";
+import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
+import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 // import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import axios from "axios";
 import Link from "next/link";
@@ -18,17 +21,23 @@ import MyDatePicker from "@/components/DatePicker";
 
 // import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import "./loadIcon.css";
+import "./inputForm.css";
 import { jsPDF } from "jspdf";
 
 import LetterTypeSelect from "@/components/LetterTypeSelect";
 import PatientSearchBar from "@/components/PatientSearchBar";
-
-import "./loadIcon.css";
-import "./inputForm.css";
 import PatientSearchResults from "@/components/PatientSearchResults";
 
+import profilePic from "@/public/images/profile_pic.jpg";
+
+interface PatientDetails {
+  patient_id: number;
+  patient_name: string;
+  birthdate: string;
+}
+
 const DataInputForm: React.FC<any> = (props) => {
-  const [patientname, setPatientname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
@@ -39,7 +48,6 @@ const DataInputForm: React.FC<any> = (props) => {
   // const [genLetIsClicked, setGenLetIsClicked] = useState(false);
   const [voice2TextInput, setVoice2TextInput] = useState("");
   const [output, setOutput] = useState("");
-  const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
   const [tooltipMsg, setTooltipMsg] = useState("");
@@ -50,9 +58,17 @@ const DataInputForm: React.FC<any> = (props) => {
   const [patientsSearched, setPatientsSearched] = useState({});
   const [searchResultListOpened, setSearchResultListOpened] = useState(false);
 
+  const [selectedPatientDetails, setSelectedPatientDetails] =
+    useState<PatientDetails>({
+      patient_id: -1,
+      patient_name: "",
+      birthdate: "",
+    });
+
   // useEffect(() => {
-  //   console.log(searchBarInput);
-  // }, [searchBarInput]);
+  //   console.log(selectedPatientDetails);
+  //   console.log("Age: " + calculateAge(selectedPatientDetails.birthdate));
+  // }, [selectedPatientDetails]);
 
   // const handleGenLetterClick = async (voice2TextInput: string) => {
   //   try {
@@ -80,8 +96,39 @@ const DataInputForm: React.FC<any> = (props) => {
   //   }
   // };
 
+  const calculateAge = (birthdate: string) => {
+    const birthDate = new Date(birthdate);
+    const currentDate = new Date();
+
+    let age = currentDate.getFullYear() - birthDate.getFullYear();
+    const monthDiff = currentDate.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    return age;
+  };
+
   const handleGenLetterClick = async (voice2TextInput: string) => {
     try {
+      const { patient_id, patient_name, birthdate } = selectedPatientDetails;
+
+      // Validate patient_name and birthdate
+      if (!patient_name || !birthdate) {
+        alert("please select patient first!");
+        throw new Error("Patient details incomplete or missing");
+      }
+
+      const prompt = `Name: ${
+        selectedPatientDetails.patient_name
+      }\nAge: ${calculateAge(
+        selectedPatientDetails.birthdate
+      )}\n${voice2TextInput}\n\ngenerate a ${letterType} letter for the above given patient details. Make sure to make the letter customized, descriptive and readable`;
+
       setLoading(true);
       setOutput("");
       const response = await fetch("http://localhost:5050/api/generate", {
@@ -91,7 +138,7 @@ const DataInputForm: React.FC<any> = (props) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "phi3-ft", //set ollama model
+          model: "llama3-ft", //set ollama model
           prompt: voice2TextInput,
         }),
       });
@@ -131,6 +178,7 @@ const DataInputForm: React.FC<any> = (props) => {
       }
 
       setOutput((prev) => prev + result);
+
       console.log("Message sent successfully");
     } catch (error) {
       console.error("Error:", error);
@@ -209,14 +257,34 @@ const DataInputForm: React.FC<any> = (props) => {
           <MyDatePicker />
         </div>
         <div className="right-menu-items h-fit w-fit flex flex-row">
-          <div className="user-name bg-slate-500 px-5 py-1 rounded-md mr-5">
-            Settings
+          <div className="flex items-center bg-slate-500 hover:bg-slate-400 px-2 py-1 rounded-2xl mr-4">
+            <SettingsRoundedIcon />
           </div>
-          <Link href="/">
+          {/* <Link href="/">
             <div className="user-name bg-slate-500 px-5 py-1 rounded-md">
               Logout
             </div>
-          </Link>
+          </Link> */}
+          <div className="flex items-center bg-slate-500 hover:bg-slate-400 rounded-2xl">
+            <div className="user-avatar bg-slate-200 w-9 h-9 rounded-full m-1 overflow-hidden flex-shrink-0 relative">
+              <Image
+                src={profilePic}
+                alt="PP"
+                className="w-full h-full object-cover rounded-full"
+              />
+            </div>
+            <div className="user-name px-2 py-1 ml-2">
+              <label className="text-white text-md font-medium">
+                Doctor Username
+              </label>
+            </div>
+            <KeyboardArrowDownRoundedIcon className=" mr-3" />
+          </div>
+
+          {/* <div className="user-name bg-slate-500 px-2 py-1 rounded-lg mr-5">
+            <div className=""><Image src={profilePic} alt="PP" /></div>
+            <label>Doctor Name</label>
+          </div> */}
         </div>
       </div>
       <div className="flex flex-col md:flex-row h-full pb-7">
@@ -246,6 +314,7 @@ const DataInputForm: React.FC<any> = (props) => {
                       setPatientsSearched={setPatientsSearched}
                       setSearchResultListOpened={setSearchResultListOpened}
                       setSearchBarInput={setSearchBarInput}
+                      setSelectedPatientDetails={setSelectedPatientDetails}
                     />
                   </>
                 ) : (
