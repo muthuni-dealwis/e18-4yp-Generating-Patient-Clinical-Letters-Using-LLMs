@@ -46,7 +46,7 @@ const PatientSearchBar: React.FC<Props> = ({
         onFocus={() => {
           setSearchResultListOpened(true);
         }}
-        placeholder={searchBarInput ? "" : "type patient name or no..."} // Conditional placeholder
+        placeholder={searchBarInput ? "" : "type to search or add patient ..."} // Conditional placeholder
       />
     </div>
   );

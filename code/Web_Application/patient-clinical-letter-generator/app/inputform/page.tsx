@@ -2,8 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import { TextField, Button, useRadioGroup } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
+
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
+import PrintIcon from "@mui/icons-material/Print";
+import DriveFileRenameOutlineRoundedIcon from "@mui/icons-material/DriveFileRenameOutlineRounded";
+import AutoFixHighRoundedIcon from "@mui/icons-material/AutoFixHighRounded";
+import ContentCopyRoundedIcon from "@mui/icons-material/ContentCopyRounded";
+import CleaningServicesRoundedIcon from "@mui/icons-material/CleaningServicesRounded";
 // import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import axios from "axios";
 import Link from "next/link";
@@ -34,15 +41,18 @@ const DataInputForm: React.FC<any> = (props) => {
   const [output, setOutput] = useState("");
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const [tooltipMsg, setTooltipMsg] = useState("");
+  const [outputEditable, setOutputEditable] = useState(false);
 
   const [searchBarInput, setSearchBarInput] = useState("");
   const [letterType, setLetterType] = useState("Discharge");
   const [patientsSearched, setPatientsSearched] = useState({});
   const [searchResultListOpened, setSearchResultListOpened] = useState(false);
 
-  useEffect(() => {
-    console.log(searchBarInput);
-  }, [searchBarInput]);
+  // useEffect(() => {
+  //   console.log(searchBarInput);
+  // }, [searchBarInput]);
 
   // const handleGenLetterClick = async (voice2TextInput: string) => {
   //   try {
@@ -81,7 +91,7 @@ const DataInputForm: React.FC<any> = (props) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "llama3-ft", //set ollama model
+          model: "phi3-ft", //set ollama model
           prompt: voice2TextInput,
         }),
       });
@@ -129,6 +139,25 @@ const DataInputForm: React.FC<any> = (props) => {
     }
   };
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey && event.key === "Enter") {
+        if (voice2TextInput) {
+          handleGenLetterClick(voice2TextInput);
+        } else {
+          alert("please enter patient deatails first!");
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [voice2TextInput, handleGenLetterClick]);
+
   const downloadClinicalLetter = () => {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -137,7 +166,7 @@ const DataInputForm: React.FC<any> = (props) => {
     const lineHeight = 10;
 
     // Split the text into lines that fit within the page width
-    const splitText = doc.splitTextToSize(text, maxLineWidth);
+    const splitText = doc.splitTextToSize(output, maxLineWidth);
     let cursorY = margin;
 
     splitText.forEach((line: string | string[]) => {
@@ -152,6 +181,22 @@ const DataInputForm: React.FC<any> = (props) => {
     });
 
     doc.save("generated.pdf");
+  };
+
+  const handleCopyToClipboard = () => {
+    navigator.clipboard
+      .writeText(output)
+      .then(() => {
+        setTooltipMsg("Copied!");
+        setTooltipOpen(true);
+        setTimeout(() => setTooltipOpen(false), 2000); // Hide tooltip after 2 seconds
+      })
+      .catch((err) => {
+        setTooltipMsg("Error Copying!");
+        setTooltipOpen(true);
+        setTimeout(() => setTooltipOpen(false), 2000);
+        console.error("Failed to copy: ", err);
+      });
   };
 
   return (
@@ -235,6 +280,7 @@ const DataInputForm: React.FC<any> = (props) => {
                 hover:text-white hover:border-sky-600 active:bg-sky-700 active:text-white active:border-sky-800"
                 onClick={() => handleGenLetterClick(voice2TextInput)}
               >
+                <AutoFixHighRoundedIcon className="mr-1 text-lg" />
                 <label>Generate Patient Clinical Letter</label>
               </div>
             </div>
@@ -281,23 +327,69 @@ const DataInputForm: React.FC<any> = (props) => {
               ) : (
                 <>
                   <textarea
-                    className="absolute inset-0 w-full h-full bg-transparent px-4 py-7 text-justify resize-none"
+                    className="output-textarea absolute inset-0 w-full h-full bg-transparent px-4 py-7 text-justify resize-none"
                     style={{ whiteSpace: "pre-line" }}
                     value={output}
                     placeholder="Here is your output will be shown ..."
                     onChange={(e) => setOutput(e.target.value)}
-                    disabled
+                    disabled={!outputEditable}
                   />
                 </>
               )}
             </div>
-            <div
-              className="gen-letter bg-sky-500 w-fit h-8 px-5 rounded-2xl absolute flex justify-center 
-                items-center shadow-lg border border-sky-500 text-white font-sans font-medium hover:bg-sky-600 
-                hover:text-white hover:border-sky-600 active:bg-sky-700 active:text-white active:border-sky-800"
-              onClick={() => downloadClinicalLetter()}
-            >
-              <label>Download Letter</label>
+            <div className="output-controllers absolute flex flex-row">
+              <div
+                className={`${
+                  outputEditable ? "w-32 px-3" : "w-10"
+                } bg-red-500 h-9 rounded-2xl flex justify-center items-center shadow-lg border 
+                border-red-500 text-white font-sans font-medium hover:bg-red-600 hover:text-white hover:border-red-600 
+                active:bg-red-700 active:text-white active:border-red-800 mr-1 transition-all duration-300 ease-in-out`}
+                onClick={() => {
+                  setOutputEditable((prevState) => !prevState);
+                }}
+              >
+                <DriveFileRenameOutlineRoundedIcon style={{ fontSize: 20 }} />
+                {outputEditable ? (
+                  <label className="text-sm ml-2 transition-opacity duration-300 ease-in-out opacity-100">
+                    Edit mode
+                  </label>
+                ) : (
+                  <label className="text-sm ml-2 transition-opacity duration-300 ease-in-out opacity-0 absolute">
+                    Edit mode
+                  </label>
+                )}
+              </div>
+
+              <Tooltip title={tooltipMsg} open={tooltipOpen} arrow>
+                <div
+                  className="bg-green-500 w-10 h-9 rounded-2xl flex justify-center items-center shadow-lg border 
+                  border-green-500 text-white font-sans font-medium hover:bg-green-600 hover:text-white hover:border-green-600 
+                  active:bg-green-700 active:text-white active:border-green-800 mr-1"
+                  onClick={handleCopyToClipboard}
+                >
+                  <ContentCopyRoundedIcon style={{ fontSize: 19 }} />
+                </div>
+              </Tooltip>
+
+              <div
+                className="bg-blue-500 w-10 h-9 rounded-2xl flex justify-center items-center shadow-lg border 
+                border-blue-500 text-white font-sans font-medium hover:bg-blue-600 hover:text-white hover:border-blue-600 
+                active:bg-blue-700 active:text-white active:border-blue-800 mr-1"
+                onClick={() => {
+                  setOutput("");
+                }}
+              >
+                <CleaningServicesRoundedIcon style={{ fontSize: 19 }} />
+              </div>
+
+              <div
+                className="bg-purple-500 w-10 h-9 rounded-2xl flex justify-center items-center shadow-lg border 
+                border-purple-500 text-white font-sans font-medium hover:bg-purple-600 hover:text-white hover:border-purple-600 
+                active:bg-purple-700 active:text-white active:border-purple-800"
+                onClick={() => downloadClinicalLetter()}
+              >
+                <PrintIcon style={{ fontSize: 19 }} />
+              </div>
             </div>
           </div>
         </div>

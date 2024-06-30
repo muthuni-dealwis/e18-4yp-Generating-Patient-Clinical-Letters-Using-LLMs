@@ -72,7 +72,9 @@ const PatientSearchResults: React.FC<Props> = ({
               onMouseLeave={() => setHoveredItem(null)}
               onClick={() => handleListItemClick(patientId)}
             >
-              {patientsSearched[patientId]}
+              {patientId.toString().padStart(4, "0") +
+                " - " +
+                patientsSearched[patientId]}
               {hoveredItem === patientId && (
                 <>
                   <div
