@@ -104,8 +104,10 @@ def login():
     mycursor.execute("SELECT * FROM user WHERE email = %s", (email,))
     user = mycursor.fetchone()
 
-    if not user or not check_password_hash(user[2], password):
-        return jsonify({"message": "Invalid credentials"}), 401
+    if not user:
+        return jsonify({"message": "User does not exist"}), 401
+    elif not check_password_hash(user[2], password):
+        return jsonify({"message": "Invalid password"}), 402
 
     mycursor.close()
 
