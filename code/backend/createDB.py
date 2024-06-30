@@ -8,7 +8,7 @@ mydb = mysql.connector.connect(
 
 mycursor = mydb.cursor() 
 
-with open(r'code\backend\dbStructure.sql', 'r') as file:
+with open(r'.\dbStructure.sql', 'r') as file:
     sql_script = file.read()
 
 # Split the script into individual statements

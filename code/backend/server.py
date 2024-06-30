@@ -17,6 +17,22 @@ mydb = mysql.connector.connect(
     database = "fyp",
 )
 
+# Global variable to store patient data
+patient_data = {}
+
+def fetch_patient_data():
+    """
+    Fetch all patient IDs and patient names from the patient table
+    and store them in the global patient_data dictionary.
+    """
+    global patient_data
+    mycursor = mydb.cursor(dictionary=True)
+    mycursor.execute("SELECT patient_id, patient_name FROM patient")
+    patients = mycursor.fetchall()
+    mycursor.close()
+    
+    patient_data = {patient['patient_id']: patient['patient_name'] for patient in patients}
+
 # /api/home
 @app.route("/api/home", methods=['GET'])
 def return_home():
@@ -95,5 +111,35 @@ def login():
 
     return jsonify({"message": "Login successful"}), 200
 
+@app.route("/api/names", methods=['GET'])
+def return_names():
+    demo_names = [
+        "Alice", "Bob", "Charlie", "David", "Emma",
+        "Frank", "Grace", "Henry", "Ivy", "Jack",
+        "Kate", "Liam", "Mia", "Noah", "Olivia",
+        "Peter", "Quinn", "Rose", "Sam", "Tina"
+    ]
+
+    # Ensure the array has exactly 20 elements
+    demo_names = demo_names[:20]
+
+    return jsonify({
+        'names': demo_names
+    })
+
+@app.route('/api/search', methods=['POST'])
+def search_patients():
+    query = request.json.get('query', '').lower()
+    if not query:
+        return jsonify({"error": "No query provided"}), 400
+
+    matched_patients = {pid: name for pid, name in patient_data.items() if query in str(pid).lower() or query in name.lower()}
+    
+    if not matched_patients:
+        return jsonify({"error": "No match found"}), 404
+
+    return jsonify(matched_patients)
+
 if __name__ == "__main__":
+    fetch_patient_data()
     app.run(debug=True, port=8080)
