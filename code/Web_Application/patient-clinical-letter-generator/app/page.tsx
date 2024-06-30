@@ -1,23 +1,33 @@
-'use client'
+// Home.jsx
+
 import React from "react";
 import Link from 'next/link';
-import styles from './Home.module.css'; // Adjust the path as necessary
+import styles from './Home.module.css'; // Import styles from a CSS module or adjust paths as necessary
 
-const Home: React.FC<any> = () => {
+const Home = () => {
   return (
-    <div className={styles.background}>
-      <h1>Welcome to the Home Page</h1>
-      <Link href="/login">
-        Login
-      </Link>
-      <br />
-      <Link href="/register">
-        Register
-      </Link>
+    <div style={{ width: '100%' }}>
+      <div style={{ display: 'flex', height: '100vh' }}>
+        <div style={{
+          flex: '0 0 50%',
+          background: 'url("/images/FYP_Home.jpg") center/cover no-repeat',
+          
+        }}></div>
+
+      <div className={styles.contentContainer}>
+        <div className={styles.content}>
+          <h2>Transforming patient care with precision and compassion through intelligent clinical letter generation</h2>
+          <div className={styles.buttonContainer}>
+            <Link href="/login" passHref className={styles.loginButton}>Login
+            </Link>
+            <Link href="/register" passHref className={styles.registerButton}>Register
+            </Link>
+          </div>
+        </div>
+      </div>
+    </div>
     </div>
   );
 };
 
 export default Home;
-
-

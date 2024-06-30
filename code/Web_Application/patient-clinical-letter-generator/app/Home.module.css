@@ -1,12 +1,74 @@
+/* Home.module.css */
 
-.background {
-    background-image: url('/images/YP_HomePage.jpg');
-    background-size: cover;
-    background-position: center;
-    height: 100vh;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.container {
+  width: 100%;
+}
+
+.imageContainer {
+  flex: 0 0 50%;
+  background: url("/images/FYP_Home.jpg") center/cover no-repeat;
+}
+
+.contentContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+  text-align: center;
+  opacity: 0; /* Initially hide the content */
+  animation: slideIn 1s forwards; /* Apply the slideIn animation */
+}
+
+.content h1 {
+  font-size: 2.5rem;
+  color: white;
+}
+
+.content h2 {
+  font-size: 1.5rem;
+  color: white;
+  margin-bottom: 20px;
+  text-align: left; /* Align text to the left */
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.loginButton,
+.registerButton {
+  display: inline-block;
+  padding: 10px 20px;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 5px;
+  margin-right: 10px;
+  opacity: 0; /* Initially hide the buttons */
+  animation: slideIn 1s forwards; /* Apply the slideIn animation */
+}
+
+.loginButton {
+  background-color: #004953;
+}
+
+.registerButton {
+  background-color: #4c2882;
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateY(-50px); /* Start offscreen */
+    opacity: 0;
   }
+  100% {
+    transform: translateY(0); /* Slide into place */
+    opacity: 1;
+  }
+}

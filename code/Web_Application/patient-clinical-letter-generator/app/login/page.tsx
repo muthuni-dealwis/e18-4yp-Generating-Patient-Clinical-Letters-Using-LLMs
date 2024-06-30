@@ -1,9 +1,15 @@
 'use client'
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from 'next/link';
 import HomeIcon from "@/components/HomeNavigator";
+import { Snackbar, Alert, AlertColor, SnackbarCloseReason } from "@mui/material";
+
+interface State {
+  vertical: "top" | "bottom";
+  horizontal: "left" | "center" | "right";
+}
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -12,69 +18,119 @@ export default function Login() {
   const [isLoginClicked, setIsLoginClicked] = useState(false);
   const router = useRouter(); 
   const [isFormValid, setIsFormValid] = useState(false); 
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<AlertColor>("success");
+  const [snackbarPosition, setSnackbarPosition] = useState<State>({
+    vertical: "top",
+    horizontal: "center",
+  });
 
-  const validateForm = () => { 
-    let errors: any = {}; 
+  const { vertical, horizontal } = snackbarPosition;
 
-    if(isLoginClicked){
-      if (!email) { 
-        errors.email = 'Email is required.'; 
-      } else if (!/\S+@\S+\.\S+/.test(email)) { 
-          errors.email = 'Email is invalid.'; 
-      } 
+  const validateForm = () => {
+    // let errors: any = {};
 
-      if (!password) { 
-          errors.password = 'Password is required.'; 
-      } else if (password.length < 6) { 
-          errors.password = 'Password must be at least 6 characters.'; 
-      } 
+    // if (!email) {
+    //   errors.email = 'Email is required.';
+    // } else if (!/\S+@\S+\.\S+/.test(email)) {
+    //   errors.email = 'Email is invalid.';
+    // }
 
-      setErrors(errors); 
-      setIsFormValid(Object.keys(errors).length === 0); 
-    }
+    // if (!password) {
+    //   errors.password = 'Password is required.';
+    // } else if (password.length < 6) {
+    //   errors.password = 'Password must be at least 6 characters.';
+    // }
+
+    // setErrors(errors);
+    // setIsFormValid(Object.keys(errors).length === 0);
   };
-  
-  const handleSubmit = async () => {
 
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setIsLoginClicked(true);
     // validateForm();
 
-    // if(isFormValid){
-    //   event.preventDefault();
-    //   console.log("Email:", email);
-    //   console.log("Password:", password);
-    //   // Add your form submission logic here
-    // }
-    // else{
-    //   console.log("Invalid Form");
-    // }
+    // if (isFormValid) {
 
-    event.preventDefault();
+    if(email == ''){
+      setSnackbarMessage("Enter email");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
+    else if(password == ''){
+      setSnackbarMessage("Enter password");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+    }
+    else{
+      try {
+        const response = await fetch("http://localhost:8080/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password }),
+        });
 
-    try {
-      const response = await fetch("http://localhost:8080/api/login", {
-        method: "POST",
-        headers: {"Content-Type": "application/json",},
-        body: JSON.stringify({ password, email }),
-      });
-        console.log("Login success", response.json);
-        router.push("/inputform");
-    } catch (error:any) {
+        if (response.status == 200) {
+          console.log("Login success", response);
+          setSnackbarMessage("Login Success");
+          setSnackbarSeverity("success");
+          setSnackbarOpen(true);
+
+          // Delay navigation to show snackbar
+          setTimeout(() => {
+            router.push("/inputform");
+          }, 2000);
+        }
+        else if(response.status == 401){
+          console.log("Login failed", response.statusText);
+          setSnackbarMessage("User does not exist");
+          setSnackbarSeverity("error");
+          setSnackbarOpen(true);
+        }
+        else if(response.status == 402){
+          console.log("Login failed", response.statusText);
+          setSnackbarMessage("Invalid Password");
+          setSnackbarSeverity("error");
+          setSnackbarOpen(true);
+        }
+        else{
+          console.log("Login failed", response.statusText);
+          setSnackbarMessage("Login failed");
+          setSnackbarSeverity("error");
+          setSnackbarOpen(true);
+        }
+      } catch (error: any) {
         console.log("Login failed", error.message);
-    } finally{
-    }    
+        setSnackbarMessage("Login Failed");
+        setSnackbarSeverity("error");
+        setSnackbarOpen(true);
+      }
+    }
+  } 
+  
 
+  const handleSnackbarClose = (event: Event | React.SyntheticEvent<any, Event>, reason?: SnackbarCloseReason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+  const handleAlertClose = (event: React.SyntheticEvent<Element, Event>) => {
+    setSnackbarOpen(false);
   };
 
   return (
-
     <div>
-       <div className="flex justify-end">
+      <div className="flex justify-end">
         <div className="text-white font-bold">
-            <HomeIcon/>
+          <HomeIcon />
         </div>
-        </div>
- 
-        <div className="auth-form-container">
+      </div>
+
+      <div className="auth-form-container">
         <label className="login-register-heading font-sans text-slate-200 font-medium mb-9 tracking-wider">Login</label>
         <form className="login-form" onSubmit={handleSubmit}>
           <label htmlFor="email" className="font-sans text-slate-200 font-normal mb-1">Email</label>
@@ -87,7 +143,7 @@ export default function Login() {
             id="email"
             name="email"
           />
-          {errors.email &&  <span className='text-danger'> {errors.email} </span>}
+          {errors.email && <span className='text-danger'>{errors.email}</span>}
 
           <label htmlFor="password" className="font-sans text-slate-200 font-normal mb-1">Password</label>
           <input
@@ -99,18 +155,26 @@ export default function Login() {
             id="password"
             name="password"
           />
-          {errors.password && <span className='text-danger'> {errors.password} </span>}
+          {errors.password && <span className='text-danger'>{errors.password}</span>}
 
-          <button  className="linkSubmit mt-10 bg-violet-500 font-sans font-medium text-white tracking-widest" type="submit" >Login</button>
-          
+          <button className="linkSubmit mt-10 bg-violet-500 font-sans font-medium text-white tracking-widest" type="submit">Login</button>
         </form>
 
-        <Link href =  "/register">
-          <button className="link-btn" onClick={() => setIsLoginClicked(true)}>Don't have an account? Register here.</button>
+        <Link href="/register">
+          <button className="link-btn">Don't have an account? Register here.</button>
         </Link>
-        
       </div>
+
+      <Snackbar
+        anchorOrigin={{ vertical, horizontal }}
+        open={snackbarOpen}
+        autoHideDuration={5000}
+        onClose={handleSnackbarClose}
+      >
+        <Alert onClose={handleAlertClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
-
