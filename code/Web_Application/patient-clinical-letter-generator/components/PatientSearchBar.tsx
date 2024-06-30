@@ -38,7 +38,7 @@ const PatientSearchBar: React.FC<Props> = ({
       <input
         type="text"
         id="patientName"
-        className="patientName-input flex-grow rounded-md"
+        className="bg-slate-200 patientName-input flex-grow rounded-md"
         value={searchBarInput}
         onChange={(event) => {
           handleChange(event.target.value);

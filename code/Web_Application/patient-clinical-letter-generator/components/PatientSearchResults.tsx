@@ -49,7 +49,7 @@ const PatientSearchResults: React.FC<Props> = ({
   return (
     <div
       ref={node}
-      className="search-result-container absolute w-full bg-neutral-50 rounded-md top-full left-0 z-50 mt-2 mr-2"
+      className="search-result-container absolute w-full bg-slate-600 rounded-md top-full left-0 z-50 mt-2 mr-2"
       style={{
         width: `calc(100% - 0.5rem)`,
         boxShadow: "0px 0px 6px #7d7d7d",
@@ -67,7 +67,7 @@ const PatientSearchResults: React.FC<Props> = ({
           return (
             <div
               key={key}
-              className="relative px-3 py-2 font-sans font-medium hover:bg-slate-200 rounded-md text-slate-600 text-sm cursor-pointer"
+              className="relative px-3 py-2 font-sans font-medium hover:bg-slate-500 rounded-md text-slate-200 hover:text-slate-300 text-sm cursor-pointer"
               onMouseEnter={() => setHoveredItem(patientId)}
               onMouseLeave={() => setHoveredItem(null)}
               onClick={() => handleListItemClick(patientId)}
@@ -78,7 +78,7 @@ const PatientSearchResults: React.FC<Props> = ({
               {hoveredItem === patientId && (
                 <>
                   <div
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200"
                     onClick={() => {
                       alert("update: " + patientsSearched[patientId]);
                     }}
@@ -92,13 +92,13 @@ const PatientSearchResults: React.FC<Props> = ({
         })}
       </div>
       <div
-        className="addPatient px-3 py-2 border-t-2 text-sm cursor-pointer"
+        className="addPatient px-3 py-2 border-t-2 border-slate-500 text-sm cursor-pointer"
         onClick={() => {
           alert("add new patient");
         }}
       >
-        <QueuePlayNextIcon className="text-blue-500 pr-1" />
-        <label className="pl-3 text-blue-500 font-medium font-sans cursor-pointer">
+        <QueuePlayNextIcon className="text-blue-300 pr-1" />
+        <label className="pl-3 text-blue-300 font-medium font-sans cursor-pointer">
           Add new patient
         </label>
       </div>

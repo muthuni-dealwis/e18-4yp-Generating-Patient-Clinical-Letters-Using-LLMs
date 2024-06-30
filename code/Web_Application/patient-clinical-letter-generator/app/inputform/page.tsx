@@ -5,7 +5,7 @@ import { TextField, Button, useRadioGroup } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 
 import MicIcon from "@mui/icons-material/Mic";
-import MicOffIcon from "@mui/icons-material/MicOff";
+import StopRoundedIcon from "@mui/icons-material/StopRounded";
 import PrintIcon from "@mui/icons-material/Print";
 import DriveFileRenameOutlineRoundedIcon from "@mui/icons-material/DriveFileRenameOutlineRounded";
 import AutoFixHighRoundedIcon from "@mui/icons-material/AutoFixHighRounded";
@@ -148,6 +148,9 @@ const DataInputForm: React.FC<any> = (props) => {
           alert("please enter patient deatails first!");
         }
       }
+      if (event.ctrlKey && event.key === " ") {
+        setMicState((prev) => !prev);
+      }
     };
 
     document.addEventListener("keydown", handleKeyDown);
@@ -267,11 +270,25 @@ const DataInputForm: React.FC<any> = (props) => {
               <div className="voice2text-controllers absolute flex flex-row">
                 <div
                   className={`${
-                    micState ? "bg-green-500" : "bg-red-500"
-                  } w-14 h-10 rounded-2xl flex justify-center items-center shadow-lg`}
-                  onClick={() => setMicState(!micState)}
+                    micState
+                      ? "w-32 px-3 bg-red-500 border-red-500 hover:bg-red-600 hover:border-red-600 active:bg-red-700 active:border-red-800"
+                      : "w-12 bg-green-600 border-green-600 hover:bg-green-700 hover:border-green-700 active:bg-green-800 active:border-green-900"
+                  } h-9 rounded-2xl flex justify-center items-center shadow-lg border text-white font-sans font-medium hover:text-white 
+                  active:text-white mr-1 transition-all duration-300 ease-in-out`}
+                  onClick={() => {
+                    setMicState((prevState) => !prevState);
+                  }}
                 >
-                  {micState ? <MicIcon /> : <MicOffIcon />}
+                  {micState ? (
+                    <>
+                      <StopRoundedIcon style={{ fontSize: 20 }} />
+                      <label className="text-sm ml-2 transition-opacity duration-300 ease-in-out opacity-100">
+                        00:00:01
+                      </label>
+                    </>
+                  ) : (
+                    <MicIcon style={{ fontSize: 20 }} />
+                  )}
                 </div>
               </div>
               <div
