@@ -20,19 +20,6 @@ import "./loadIcon.css";
 import "./inputForm.css";
 import PatientSearchResults from "@/components/PatientSearchResults";
 
-const style = {
-  position: 'absolute' as 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
-
-
 const DataInputForm: React.FC<any> = (props) => {
   const [patientname, setPatientname] = useState("");
   const [email, setEmail] = useState("");
@@ -40,6 +27,7 @@ const DataInputForm: React.FC<any> = (props) => {
   const [errors, setErrors] = useState({});
   const [input, setInput] = useState("");
   const [period, setPeriod] = useState("");
+  const [patientID, setPatientID] = useState("");
 
   const [micState, setMicState] = useState(true);
   // const [genLetIsClicked, setGenLetIsClicked] = useState(false);
@@ -57,36 +45,11 @@ const DataInputForm: React.FC<any> = (props) => {
   const [selectedDate1, setSelectedDate1] =  useState<Date>(new Date());
   const [selectedDate2, setSelectedDate2] =  useState<Date>(new Date());
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [historyDetails, setHistoryDetails] = useState("");
 
   useEffect(() => {
     console.log(searchBarInput);
   }, [searchBarInput]);
-
-  // const handleGenLetterClick = async (voice2TextInput: string) => {
-  //   try {
-  //     setOutput("Loading ...");
-  //     const response = await fetch("http://localhost:8080/api/chat", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ prompt: voice2TextInput }),
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error("Failed to send message");
-  //     }
-
-  //     const responseData = await response.json();
-  //     setOutput(responseData.response);
-  //     setText(responseData.response);
-
-  //     console.log("Message sent successfully");
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //     setOutput("Error occured! Try again");
-  //   }
-  // };
 
   const handleGenLetterClick = async (voice2TextInput: string) => {
     try {
@@ -191,8 +154,30 @@ const DataInputForm: React.FC<any> = (props) => {
     }
   };
 
-  const viewHistory = () => {
+  const viewHistory = async() => {
     setModalIsOpen(true);
+    console.log("try");
+
+    try {
+      const response = await fetch("http://localhost:8080/api/patientHistory", {
+          method: "POST",
+          headers: {"Content-Type": "application/json",},
+          body: JSON.stringify({ patientname, patientID:3 }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch data"); // Throw an error if response not ok
+      }
+    
+      const responseData = await response.json(); // Parse JSON response
+    
+      console.log(responseData); // Log parsed JSON data
+
+      setHistoryDetails(responseData[0].details);
+
+    } catch (error:any) {
+        console.log("Login failed", error.message);
+    }
   };
 
   const closeModal = () => {
@@ -363,14 +348,20 @@ const DataInputForm: React.FC<any> = (props) => {
         onClose={closeModal}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
+        className="flex items-center justify-center"
       >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Text in a modal
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-          </Typography>
+        <Box
+          className="fixed  flex items-top justify-center rounded-lg"
+          sx={{width: 600, height: 400, bgcolor: 'background.paper', border: '2px solid #000', boxShadow: 24,p:2,}}
+        >
+          <div className="w-full">
+            <Typography id="modal-modal-title" variant="h6" component="h2" className="mb-4">
+              Patient History
+            </Typography>
+            <Typography id="modal-modal-description" className="mt-4">
+              {historyDetails}
+            </Typography>
+          </div>
         </Box>
       </Modal>
 

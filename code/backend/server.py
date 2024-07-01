@@ -9,7 +9,6 @@ import mysql.connector
 app = Flask(__name__)
 CORS(app)
 
-
 mydb = mysql.connector.connect(
     host = "localhost",
     user = "root",
@@ -141,6 +140,67 @@ def search_patients():
         return jsonify({"error": "No match found"}), 404
 
     return jsonify(matched_patients)
+
+
+@app.route('/api/patientHistory',methods=['POST'])
+def getPatientHistory():
+    data = request.json
+    name = data.get('patientname')
+    patient_id = data.get('patientID')
+
+    cursor = mydb.cursor(dictionary=True)
+
+    if name:
+        query = "SELECT * FROM history WHERE name = %s"
+        cursor.execute(query, (name,))
+    elif patient_id:
+        query = "SELECT details FROM history WHERE patient_id = %s"
+        cursor.execute(query, (patient_id,))
+    else:
+        return jsonify({'error': 'Invalid request'}), 400
+
+    result = cursor.fetchall()
+    return jsonify(result), 200
+
+@app.route('/api/patientData',methods=['POST'])
+def getPatientData():
+    data = request.json
+    patient_name = data.get('patientname')
+    patient_id = data.get('patientID')
+
+    cursor = mydb.cursor(dictionary=True)
+
+    if patient_name:
+        query = "SELECT * FROM patient WHERE patient_name = %s"
+        cursor.execute(query, (patient_name,))
+    elif patient_id:
+        query = "SELECT details FROM patient WHERE patient_id = %s"
+        cursor.execute(query, (patient_id,))
+    else:
+        return jsonify({'error': 'Invalid request'}), 400
+
+    result = cursor.fetchall()
+    return jsonify(result), 200
+
+@app.route('/api/addPatientData',methods=['POST'])
+def addPatientData():
+    data = request.json
+    patient_name = data.get('patientname')
+    patient_id = data.get('patientID')
+
+    cursor = mydb.cursor(dictionary=True)
+
+    if patient_name:
+        query = "SELECT * FROM patient WHERE patient_name = %s"
+        cursor.execute(query, (patient_name,))
+    elif patient_id:
+        query = "SELECT details FROM patient WHERE patient_id = %s"
+        cursor.execute(query, (patient_id,))
+    else:
+        return jsonify({'error': 'Invalid request'}), 400
+
+    result = cursor.fetchall()
+    return jsonify(result), 200
 
 if __name__ == "__main__":
     fetch_patient_data()
