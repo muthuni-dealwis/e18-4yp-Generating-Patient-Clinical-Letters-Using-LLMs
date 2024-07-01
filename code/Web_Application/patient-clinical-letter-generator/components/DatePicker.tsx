@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { DatePickerProps } from './Props';
+import React, { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { DatePickerProps } from "./Props";
 
-const MyDatePicker: React.FC<DatePickerProps> = (props) => {
+const MyDatePicker: React.FC<DatePickerProps> = (props, { outlineColor }) => {
+
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   useEffect(() => {
@@ -24,7 +25,8 @@ const MyDatePicker: React.FC<DatePickerProps> = (props) => {
         selected={selectedDate}
         onChange={(date: Date) => props.onDateChange(date)}
         dateFormat="dd/MM/yyyy"
-        className="custom-datepicker bg-slate-700 text-white rounded px-2 py-1"
+        className="custom-datepicker bg-slate-700 text-white rounded px-2 py-1 outline outline-2 text-sm text-center outline-slate-600"
+        // className={`custom-datepicker bg-slate-700 text-white rounded px-2 py-1 outline outline-2 text-sm text-center outline-slate-${outlineColor}`}
       />
     </div>
   );
