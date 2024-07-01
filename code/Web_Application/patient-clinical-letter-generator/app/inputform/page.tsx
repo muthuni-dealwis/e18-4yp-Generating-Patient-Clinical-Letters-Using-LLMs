@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { TextField, Button, useRadioGroup } from "@mui/material";
+import { TextField, Button, useRadioGroup, Modal, Box, Typography } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import Image from "next/image";
 
@@ -297,6 +297,7 @@ const DataInputForm: React.FC<any> = (props) => {
     // } catch (error: any) {
     //   console.log("Login failed", error.message);
     // }
+
   };
 
   const closeModal = () => {
@@ -306,20 +307,13 @@ const DataInputForm: React.FC<any> = (props) => {
   return (
     <div className="data-input-container box-border w-full h-screen flex flex-col px-7 md:px-16 py-2">
       <div className="menu-bar w-full px-1 h-16 text-white flex flex-row place-content-between pt-2 mb-3">
-        <div className="py-1">
-          <MyDatePicker
-            labelName="Date:"
-            type="default"
-            selectedDate={selectedDate0}
-            onDateChange={handleDefaultChange}
-          />
-        </div>
+        <div><MyDatePicker labelName = "Date:" type = "default"  selectedDate={selectedDate0} onDateChange={handleDefaultChange}/></div>
         <div className="right-menu-items h-fit w-fit flex flex-row">
-          <div className="flex items-center bg-slate-500 hover:bg-slate-400 px-2 py-1 rounded-2xl mr-4">
-            <SettingsRoundedIcon />
+          <div className="user-name bg-slate-700 px-5 py-1 rounded-md mr-5">
+            Settings
           </div>
-          {/* <Link href="/">
-            <div className="user-name bg-slate-500 px-5 py-1 rounded-md">
+          <Link href="/">
+            <div className="user-name bg-slate-700 px-5 py-1 rounded-md">
               Logout
             </div>
           </Link> */}
@@ -429,24 +423,37 @@ const DataInputForm: React.FC<any> = (props) => {
               </div>
             </div>
           </div>
+
           {/* <div className="data-input-form flex flex-grow flex-grow-0 flex-col h-1/5">
             <div className="font-sans text-lg font-medium tracking-wide ml-3 h-12">
+          <div className="data-input-form flex flex-grow flex-grow-0 flex-col h-1/5">
+            <div className="font-sans text-lg font-medium tracking-wide ml-3 h-11">
+
               Patient History
             </div>
-            <div className="period-select flex-glow bg-slate-500 w-full h-full flex items-center justify-center rounded-md py-5">
+            <div className="period-select flex-glow bg-slate-700 w-full h-full flex items-center justify-center rounded-md py-3">
               <label className="font-sans font-medium tracking-wide pr-5">
                 Period
               </label>
+
+              <MyDatePicker labelName="" type = "history"  selectedDate={selectedDate1} onDateChange={handleDate1Change}/>
+              <label className="font-sans font-medium tracking-wide pr-5 ml-5" style={{ color: 'white' }}>
+              -
+              </label>
+              <MyDatePicker labelName="" type = "history"  selectedDate={selectedDate2} onDateChange={handleDate2Change}/>
+              
+
               <Button
                 style={{
                   marginLeft: "8px",
-                  backgroundColor: "#f59e0b",
+                  backgroundColor: "#0EA5E9",
                   padding: "0 10px",
                   textTransform: "capitalize",
                 }}
                 variant="contained"
+                onClick={viewHistory}
               >
-                Previous Diagnosis and Symptoms
+                View History
               </Button>
             </div>
           </div> */}
@@ -466,30 +473,7 @@ const DataInputForm: React.FC<any> = (props) => {
                 onDateChange={handleDate1Change}
               />
               <label
-                className="font-sans font-medium tracking-wide pr-5 ml-5"
-                style={{ color: "white" }}
-              >
-                -
-              </label>
-              <MyDatePicker
-                labelName=""
-                type="history"
-                selectedDate={selectedDate2}
-                onDateChange={handleDate2Change}
-              />
-
-              <Button
-                style={{
-                  marginLeft: "8px",
-                  backgroundColor: "#0EA5E9",
-                  padding: "0 10px",
-                  textTransform: "capitalize",
-                }}
-                variant="contained"
-                onClick={viewHistory}
-              >
-                View History
-              </Button>
+             
             </div>
           </div>
         </div>
@@ -579,6 +563,22 @@ const DataInputForm: React.FC<any> = (props) => {
           </div>
         </div>
       </div>
+      <Modal
+        open={modalIsOpen}
+        onClose={closeModal}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <Typography id="modal-modal-title" variant="h6" component="h2">
+            Text in a modal
+          </Typography>
+          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+          </Typography>
+        </Box>
+      </Modal>
+
     </div>
   );
 };
