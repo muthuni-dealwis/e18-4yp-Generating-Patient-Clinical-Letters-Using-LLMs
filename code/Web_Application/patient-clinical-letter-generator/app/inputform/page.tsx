@@ -65,6 +65,12 @@ const DataInputForm: React.FC<any> = (props) => {
       birthdate: "",
     });
 
+  const [selectedDate0, setSelectedDate0] = useState<Date>(new Date());
+  const [selectedDate1, setSelectedDate1] = useState<Date>(new Date());
+  const [selectedDate2, setSelectedDate2] = useState<Date>(new Date());
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [historyDetails, setHistoryDetails] = useState("");
+
   // useEffect(() => {
   //   console.log(selectedPatientDetails);
   //   console.log("Age: " + calculateAge(selectedPatientDetails.birthdate));
@@ -139,7 +145,7 @@ const DataInputForm: React.FC<any> = (props) => {
         },
         body: JSON.stringify({
           model: "llama3-ft", //set ollama model
-          prompt: voice2TextInput,
+          prompt: prompt,
         }),
       });
 
@@ -250,11 +256,63 @@ const DataInputForm: React.FC<any> = (props) => {
       });
   };
 
+  const handleDate1Change = (date: Date | null) => {
+    if (date) {
+      setSelectedDate1(date);
+    }
+  };
+
+  const handleDate2Change = (date: Date | null) => {
+    if (date) {
+      setSelectedDate2(date);
+    }
+  };
+
+  const handleDefaultChange = (date: Date | null) => {
+    if (date) {
+      setSelectedDate0(date);
+    }
+  };
+
+  const viewHistory = async () => {
+    setModalIsOpen(true);
+    console.log("try");
+
+    // try {
+    //   const response = await fetch("http://localhost:8080/api/patientHistory", {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify({ patientname, patientID: 3 }),
+    //   });
+
+    //   if (!response.ok) {
+    //     throw new Error("Failed to fetch data"); // Throw an error if response not ok
+    //   }
+
+    //   const responseData = await response.json(); // Parse JSON response
+
+    //   console.log(responseData); // Log parsed JSON data
+
+    //   setHistoryDetails(responseData[0].details);
+    // } catch (error: any) {
+    //   console.log("Login failed", error.message);
+    // }
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+
   return (
     <div className="data-input-container box-border w-full h-screen flex flex-col px-7 md:px-16 py-2">
       <div className="menu-bar w-full px-1 h-16 text-white flex flex-row place-content-between pt-2 mb-3">
-        <div>
-          <MyDatePicker />
+        <div className="py-1">
+          <MyDatePicker
+            labelName="Date:"
+            type="default"
+            selectedDate={selectedDate0}
+            onDateChange={handleDefaultChange}
+          />
         </div>
         <div className="right-menu-items h-fit w-fit flex flex-row">
           <div className="flex items-center bg-slate-500 hover:bg-slate-400 px-2 py-1 rounded-2xl mr-4">
@@ -371,7 +429,7 @@ const DataInputForm: React.FC<any> = (props) => {
               </div>
             </div>
           </div>
-          <div className="data-input-form flex flex-grow flex-grow-0 flex-col h-1/5">
+          {/* <div className="data-input-form flex flex-grow flex-grow-0 flex-col h-1/5">
             <div className="font-sans text-lg font-medium tracking-wide ml-3 h-12">
               Patient History
             </div>
@@ -379,7 +437,6 @@ const DataInputForm: React.FC<any> = (props) => {
               <label className="font-sans font-medium tracking-wide pr-5">
                 Period
               </label>
-              {/* <LetterTypeSelect /> */}
               <Button
                 style={{
                   marginLeft: "8px",
@@ -390,6 +447,48 @@ const DataInputForm: React.FC<any> = (props) => {
                 variant="contained"
               >
                 Previous Diagnosis and Symptoms
+              </Button>
+            </div>
+          </div> */}
+          <div className="data-input-form flex flex-grow flex-grow-0 flex-col h-1/5">
+            <div className="font-sans text-lg font-medium tracking-wide ml-3 h-11">
+              Patient History
+            </div>
+            <div className="period-select flex-glow bg-slate-700 w-full h-full flex items-center justify-center rounded-md py-3">
+              <label className="font-sans text-slate-200 font-medium tracking-wide pr-5">
+                Period
+              </label>
+
+              <MyDatePicker
+                labelName=""
+                type="history"
+                selectedDate={selectedDate1}
+                onDateChange={handleDate1Change}
+              />
+              <label
+                className="font-sans font-medium tracking-wide pr-5 ml-5"
+                style={{ color: "white" }}
+              >
+                -
+              </label>
+              <MyDatePicker
+                labelName=""
+                type="history"
+                selectedDate={selectedDate2}
+                onDateChange={handleDate2Change}
+              />
+
+              <Button
+                style={{
+                  marginLeft: "8px",
+                  backgroundColor: "#0EA5E9",
+                  padding: "0 10px",
+                  textTransform: "capitalize",
+                }}
+                variant="contained"
+                onClick={viewHistory}
+              >
+                View History
               </Button>
             </div>
           </div>
