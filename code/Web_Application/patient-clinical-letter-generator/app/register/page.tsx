@@ -17,7 +17,7 @@ const RegisterPage: React.FC<any> = (props) =>{
     const [response, setResponse] = useState('');
     const router = useRouter(); 
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
         try {
@@ -37,7 +37,6 @@ const RegisterPage: React.FC<any> = (props) =>{
             router.push("/inputform");
           } catch (error:any) {
               console.log("Login failed", error.message);
-          } finally{
           }
     }
 

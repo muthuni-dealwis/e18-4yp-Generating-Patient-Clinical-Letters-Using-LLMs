@@ -43,8 +43,9 @@ const DataInputForm: React.FC<any> = (props) => {
   const [errors, setErrors] = useState({});
   const [input, setInput] = useState("");
   const [period, setPeriod] = useState("");
+  const [patientID, setPatientID] = useState("");
 
-  const [micState, setMicState] = useState(true);
+  const [micState, setMicState] = useState(false);
   // const [genLetIsClicked, setGenLetIsClicked] = useState(false);
   const [voice2TextInput, setVoice2TextInput] = useState("");
   const [output, setOutput] = useState("");
@@ -70,37 +71,7 @@ const DataInputForm: React.FC<any> = (props) => {
   const [selectedDate2, setSelectedDate2] = useState<Date>(new Date());
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [historyDetails, setHistoryDetails] = useState("");
-
-  // useEffect(() => {
-  //   console.log(selectedPatientDetails);
-  //   console.log("Age: " + calculateAge(selectedPatientDetails.birthdate));
-  // }, [selectedPatientDetails]);
-
-  // const handleGenLetterClick = async (voice2TextInput: string) => {
-  //   try {
-  //     setOutput("Loading ...");
-  //     const response = await fetch("http://localhost:8080/api/chat", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ prompt: voice2TextInput }),
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error("Failed to send message");
-  //     }
-
-  //     const responseData = await response.json();
-  //     setOutput(responseData.response);
-  //     setText(responseData.response);
-
-  //     console.log("Message sent successfully");
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //     setOutput("Error occured! Try again");
-  //   }
-  // };
+  const [patientname,setPatientname] = useState("");
 
   const calculateAge = (birthdate: string) => {
     const birthDate = new Date(birthdate);
@@ -209,7 +180,6 @@ const DataInputForm: React.FC<any> = (props) => {
 
     document.addEventListener("keydown", handleKeyDown);
 
-    // Clean up the event listener on component unmount
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
@@ -221,8 +191,6 @@ const DataInputForm: React.FC<any> = (props) => {
     const margin = 10;
     const maxLineWidth = pageWidth - margin * 2;
     const lineHeight = 10;
-
-    // Split the text into lines that fit within the page width
     const splitText = doc.splitTextToSize(output, maxLineWidth);
     let cursorY = margin;
 
@@ -230,7 +198,6 @@ const DataInputForm: React.FC<any> = (props) => {
       doc.text(line, margin, cursorY);
       cursorY += lineHeight;
 
-      // Add new page if the current page is filled
       if (cursorY > doc.internal.pageSize.getHeight() - margin) {
         doc.addPage();
         cursorY = margin;
@@ -246,7 +213,7 @@ const DataInputForm: React.FC<any> = (props) => {
       .then(() => {
         setTooltipMsg("Copied!");
         setTooltipOpen(true);
-        setTimeout(() => setTooltipOpen(false), 2000); // Hide tooltip after 2 seconds
+        setTimeout(() => setTooltipOpen(false), 2000);
       })
       .catch((err) => {
         setTooltipMsg("Error Copying!");
@@ -274,30 +241,28 @@ const DataInputForm: React.FC<any> = (props) => {
     }
   };
 
-  const viewHistory = async () => {
+  const viewHistory = async() => {
     setModalIsOpen(true);
     console.log("try");
 
-    // try {
-    //   const response = await fetch("http://localhost:8080/api/patientHistory", {
-    //     method: "POST",
-    //     headers: { "Content-Type": "application/json" },
-    //     body: JSON.stringify({ patientname, patientID: 3 }),
-    //   });
+    try {
+      const response = await fetch("http://localhost:8080/api/patientHistory", {
+          method: "POST",
+          headers: {"Content-Type": "application/json",},
+          body: JSON.stringify({ patientname, patientID:3 }),
+      });
 
-    //   if (!response.ok) {
-    //     throw new Error("Failed to fetch data"); // Throw an error if response not ok
-    //   }
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+    
+      const responseData = await response.json();
+      console.log(responseData);
+      setHistoryDetails(responseData[0].details);
 
-    //   const responseData = await response.json(); // Parse JSON response
-
-    //   console.log(responseData); // Log parsed JSON data
-
-    //   setHistoryDetails(responseData[0].details);
-    // } catch (error: any) {
-    //   console.log("Login failed", error.message);
-    // }
-
+    } catch (error:any) {
+        console.log("Login failed", error.message);
+    }
   };
 
   const closeModal = () => {
@@ -306,17 +271,12 @@ const DataInputForm: React.FC<any> = (props) => {
 
   return (
     <div className="data-input-container box-border w-full h-screen flex flex-col px-7 md:px-16 py-2">
-      <div className="menu-bar w-full px-1 h-16 text-white flex flex-row place-content-between pt-2 mb-3">
+     <div className="menu-bar w-full px-1 h-16 text-white flex flex-row place-content-between pt-2 mb-3">
         <div><MyDatePicker labelName = "Date:" type = "default"  selectedDate={selectedDate0} onDateChange={handleDefaultChange}/></div>
         <div className="right-menu-items h-fit w-fit flex flex-row">
-          <div className="user-name bg-slate-700 px-5 py-1 rounded-md mr-5">
-            Settings
+          <div className="flex items-center bg-slate-500 hover:bg-slate-400 px-2 py-1 rounded-2xl mr-4">
+            <SettingsRoundedIcon />
           </div>
-          <Link href="/">
-            <div className="user-name bg-slate-700 px-5 py-1 rounded-md">
-              Logout
-            </div>
-          </Link> */}
           <div className="flex items-center bg-slate-500 hover:bg-slate-400 rounded-2xl">
             <div className="user-avatar bg-slate-200 w-9 h-9 rounded-full m-1 overflow-hidden flex-shrink-0 relative">
               <Image
@@ -332,11 +292,6 @@ const DataInputForm: React.FC<any> = (props) => {
             </div>
             <KeyboardArrowDownRoundedIcon className=" mr-3" />
           </div>
-
-          {/* <div className="user-name bg-slate-500 px-2 py-1 rounded-lg mr-5">
-            <div className=""><Image src={profilePic} alt="PP" /></div>
-            <label>Doctor Name</label>
-          </div> */}
         </div>
       </div>
       <div className="flex flex-col md:flex-row h-full pb-7">
@@ -424,11 +379,8 @@ const DataInputForm: React.FC<any> = (props) => {
             </div>
           </div>
 
-          {/* <div className="data-input-form flex flex-grow flex-grow-0 flex-col h-1/5">
-            <div className="font-sans text-lg font-medium tracking-wide ml-3 h-12">
           <div className="data-input-form flex flex-grow flex-grow-0 flex-col h-1/5">
             <div className="font-sans text-lg font-medium tracking-wide ml-3 h-11">
-
               Patient History
             </div>
             <div className="period-select flex-glow bg-slate-700 w-full h-full flex items-center justify-center rounded-md py-3">
@@ -456,108 +408,91 @@ const DataInputForm: React.FC<any> = (props) => {
                 View History
               </Button>
             </div>
-          </div> */}
-          <div className="data-input-form flex flex-grow flex-grow-0 flex-col h-1/5">
-            <div className="font-sans text-lg font-medium tracking-wide ml-3 h-11">
-              Patient History
-            </div>
-            <div className="period-select flex-glow bg-slate-700 w-full h-full flex items-center justify-center rounded-md py-3">
-              <label className="font-sans text-slate-200 font-medium tracking-wide pr-5">
-                Period
-              </label>
-
-              <MyDatePicker
-                labelName=""
-                type="history"
-                selectedDate={selectedDate1}
-                onDateChange={handleDate1Change}
-              />
-              <label
-             
-            </div>
           </div>
         </div>
-        <div className="box data-input-form flex flex-col w-full md:w-1/2 h-full">
-          <div className="font-sans text-lg font-medium tracking-wide ml-3 h-12">
-            Output
-          </div>
-          <div className="output-container relative flex-grow">
-            <div className="relative h-full overflow-hidden font-sans font-medium text-sm text-slate-300 bg-slate-800 rounded-md">
-              {loading ? (
-                <>
-                  <div className="w-full h-full flex items-center justify-center">
-                    <div className="lds-facebook">
-                      <div></div>
-                      <div></div>
-                      <div></div>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <textarea
-                    className="output-textarea absolute inset-0 w-full h-full bg-transparent px-4 py-7 text-justify resize-none"
-                    style={{ whiteSpace: "pre-line" }}
-                    value={output}
-                    placeholder="Here is your output will be shown ..."
-                    onChange={(e) => setOutput(e.target.value)}
-                    disabled={!outputEditable}
-                  />
-                </>
-              )}
+        <div className= "box w-full md:w-1/2 h-full md:mr-4 flex flex-col">
+          <div className="box data-input-form flex flex-col w-full h-full">
+            <div className="font-sans text-lg font-medium tracking-wide ml-3 h-12">
+              Output
             </div>
-            <div className="output-controllers absolute flex flex-row">
-              <div
-                className={`${
-                  outputEditable ? "w-32 px-3" : "w-10"
-                } bg-red-500 h-9 rounded-2xl flex justify-center items-center shadow-lg border 
-                border-red-500 text-white font-sans font-medium hover:bg-red-600 hover:text-white hover:border-red-600 
-                active:bg-red-700 active:text-white active:border-red-800 mr-1 transition-all duration-300 ease-in-out`}
-                onClick={() => {
-                  setOutputEditable((prevState) => !prevState);
-                }}
-              >
-                <DriveFileRenameOutlineRoundedIcon style={{ fontSize: 20 }} />
-                {outputEditable ? (
-                  <label className="text-sm ml-2 transition-opacity duration-300 ease-in-out opacity-100">
-                    Edit mode
-                  </label>
+            <div className="output-container relative flex-grow">
+              <div className="relative h-full overflow-hidden font-sans font-medium text-sm text-slate-300 bg-slate-800 rounded-md">
+                {loading ? (
+                  <>
+                    <div className="w-full h-full flex items-center justify-center">
+                      <div className="lds-facebook">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                      </div>
+                    </div>
+                  </>
                 ) : (
-                  <label className="text-sm ml-2 transition-opacity duration-300 ease-in-out opacity-0 absolute">
-                    Edit mode
-                  </label>
+                  <>
+                    <textarea
+                      className="output-textarea absolute inset-0 w-full h-full bg-transparent px-4 py-7 text-justify resize-none"
+                      style={{ whiteSpace: "pre-line" }}
+                      value={output}
+                      placeholder="Here is your output will be shown ..."
+                      onChange={(e) => setOutput(e.target.value)}
+                      disabled={!outputEditable}
+                    />
+                  </>
                 )}
               </div>
-
-              <Tooltip title={tooltipMsg} open={tooltipOpen} arrow>
+              <div className="output-controllers absolute flex flex-row">
                 <div
-                  className="bg-green-500 w-10 h-9 rounded-2xl flex justify-center items-center shadow-lg border 
-                  border-green-500 text-white font-sans font-medium hover:bg-green-600 hover:text-white hover:border-green-600 
-                  active:bg-green-700 active:text-white active:border-green-800 mr-1"
-                  onClick={handleCopyToClipboard}
+                  className={`${
+                    outputEditable ? "w-32 px-3" : "w-10"
+                  } bg-red-500 h-9 rounded-2xl flex justify-center items-center shadow-lg border 
+                  border-red-500 text-white font-sans font-medium hover:bg-red-600 hover:text-white hover:border-red-600 
+                  active:bg-red-700 active:text-white active:border-red-800 mr-1 transition-all duration-300 ease-in-out`}
+                  onClick={() => {
+                    setOutputEditable((prevState) => !prevState);
+                  }}
                 >
-                  <ContentCopyRoundedIcon style={{ fontSize: 19 }} />
+                  <DriveFileRenameOutlineRoundedIcon style={{ fontSize: 20 }} />
+                  {outputEditable ? (
+                    <label className="text-sm ml-2 transition-opacity duration-300 ease-in-out opacity-100">
+                      Edit mode
+                    </label>
+                  ) : (
+                    <label className="text-sm ml-2 transition-opacity duration-300 ease-in-out opacity-0 absolute">
+                      Edit mode
+                    </label>
+                  )}
                 </div>
-              </Tooltip>
 
-              <div
-                className="bg-blue-500 w-10 h-9 rounded-2xl flex justify-center items-center shadow-lg border 
-                border-blue-500 text-white font-sans font-medium hover:bg-blue-600 hover:text-white hover:border-blue-600 
-                active:bg-blue-700 active:text-white active:border-blue-800 mr-1"
-                onClick={() => {
-                  setOutput("");
-                }}
-              >
-                <CleaningServicesRoundedIcon style={{ fontSize: 19 }} />
-              </div>
+                <Tooltip title={tooltipMsg} open={tooltipOpen} arrow>
+                  <div
+                    className="bg-green-500 w-10 h-9 rounded-2xl flex justify-center items-center shadow-lg border 
+                    border-green-500 text-white font-sans font-medium hover:bg-green-600 hover:text-white hover:border-green-600 
+                    active:bg-green-700 active:text-white active:border-green-800 mr-1"
+                    onClick={handleCopyToClipboard}
+                  >
+                    <ContentCopyRoundedIcon style={{ fontSize: 19 }} />
+                  </div>
+                </Tooltip>
 
-              <div
-                className="bg-purple-500 w-10 h-9 rounded-2xl flex justify-center items-center shadow-lg border 
-                border-purple-500 text-white font-sans font-medium hover:bg-purple-600 hover:text-white hover:border-purple-600 
-                active:bg-purple-700 active:text-white active:border-purple-800"
-                onClick={() => downloadClinicalLetter()}
-              >
-                <PrintIcon style={{ fontSize: 19 }} />
+                <div
+                  className="bg-blue-500 w-10 h-9 rounded-2xl flex justify-center items-center shadow-lg border 
+                  border-blue-500 text-white font-sans font-medium hover:bg-blue-600 hover:text-white hover:border-blue-600 
+                  active:bg-blue-700 active:text-white active:border-blue-800 mr-1"
+                  onClick={() => {
+                    setOutput("");
+                  }}
+                >
+                  <CleaningServicesRoundedIcon style={{ fontSize: 19 }} />
+                </div>
+
+                <div
+                  className="bg-purple-500 w-10 h-9 rounded-2xl flex justify-center items-center shadow-lg border 
+                  border-purple-500 text-white font-sans font-medium hover:bg-purple-600 hover:text-white hover:border-purple-600 
+                  active:bg-purple-700 active:text-white active:border-purple-800"
+                  onClick={() => downloadClinicalLetter()}
+                >
+                  <PrintIcon style={{ fontSize: 19 }} />
+                </div>
               </div>
             </div>
           </div>
@@ -568,14 +503,20 @@ const DataInputForm: React.FC<any> = (props) => {
         onClose={closeModal}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
+        className="flex items-center justify-center"
       >
-        <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Text in a modal
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-            Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-          </Typography>
+        <Box
+          className="fixed  flex items-top justify-center rounded-lg"
+          sx={{width: 600, height: 400, bgcolor: 'background.paper', border: '2px solid #000', boxShadow: 24,p:2,}}
+        >
+          <div className="w-full">
+            <Typography id="modal-modal-title" variant="h6" component="h2" className="mb-4">
+              Patient History
+            </Typography>
+            <Typography id="modal-modal-description" className="mt-4">
+              {historyDetails}
+            </Typography>
+          </div>
         </Box>
       </Modal>
 

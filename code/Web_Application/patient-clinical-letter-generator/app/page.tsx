@@ -1,5 +1,3 @@
-// Home.jsx
-
 import React from "react";
 import Link from 'next/link';
 import styles from './Home.module.css'; // Import styles from a CSS module or adjust paths as necessary
@@ -14,18 +12,18 @@ const Home = () => {
           
         }}></div>
 
-      <div className={styles.contentContainer}>
-        <div className={styles.content}>
-          <h2>Transforming patient care with precision and compassion through intelligent clinical letter generation</h2>
-          <div className={styles.buttonContainer}>
-            <Link href="/login" passHref className={styles.loginButton}>Login
-            </Link>
-            <Link href="/register" passHref className={styles.registerButton}>Register
-            </Link>
+        <div className={styles.contentContainer}>
+          <div className={styles.content}>
+            <h2 className="text-center">Transforming patient care with precision and compassion through intelligent clinical letter generation</h2>
+            <div className={styles.buttonContainer}>
+              <Link href="/login" passHref className={styles.loginButton}>Login
+              </Link>
+              <Link href="/register" passHref className={styles.registerButton}>Register
+              </Link>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   );
 };
