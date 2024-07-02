@@ -141,6 +141,28 @@ def search_patients():
 
     return jsonify(matched_patients)
 
+@app.route('/api/patient-details', methods=['POST'])
+def get_patient_details():
+    patient_id = request.json.get('patient_id')
+
+    if not patient_id:
+        return jsonify({"error": "No patient_id provided"}), 400
+
+    # Query to retrieve patient_name and birthdate
+    mycursor = mydb.cursor()
+    mycursor.execute("SELECT patient_name, birthdata FROM patient WHERE patient_id = %s", (patient_id,))
+    patient = mycursor.fetchone()
+
+    if not patient:
+        return jsonify({"error": "Patient not found"}), 404
+
+    patient_name, birthdate = patient
+    return jsonify({
+        "patient_id": patient_id,
+        "patient_name": patient_name,
+        "birthdate": birthdate.strftime('%Y-%m-%d') if birthdate else None
+    })
+
 
 @app.route('/api/patientHistory',methods=['POST'])
 def getPatientHistory():
