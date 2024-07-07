@@ -37,6 +37,11 @@ interface PatientDetails {
   birthdate: string;
 }
 
+interface HistoryDetail {
+  date: string;
+  details: string;
+}
+
 const DataInputForm: React.FC<any> = (props) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -70,7 +75,7 @@ const DataInputForm: React.FC<any> = (props) => {
   const [selectedDate1, setSelectedDate1] = useState<Date>(new Date());
   const [selectedDate2, setSelectedDate2] = useState<Date>(new Date());
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [historyDetails, setHistoryDetails] = useState("");
+  const [historyDetails, setHistoryDetails] = useState<HistoryDetail[]>([]);
   const [patientname,setPatientname] = useState("");
 
   const calculateAge = (birthdate: string) => {
@@ -241,16 +246,25 @@ const DataInputForm: React.FC<any> = (props) => {
     }
   };
 
+  useEffect(() => {
+    console.log("History details:",historyDetails);
+  }, [historyDetails]);
+
+
   const viewHistory = async() => {
     setModalIsOpen(true);
     console.log("try");
+    const { patient_id, patient_name, birthdate } = selectedPatientDetails;
+    console.log(patient_id, patient_name);
 
     try {
+      console.log(patient_id, patient_name);
       const response = await fetch("http://localhost:8080/api/patientHistory", {
           method: "POST",
           headers: {"Content-Type": "application/json",},
-          body: JSON.stringify({ patientname, patientID:3 }),
+          body: JSON.stringify({ patient_name: patient_name, patient_id:patient_id}),
       });
+
 
       if (!response.ok) {
         throw new Error("Failed to fetch data");
@@ -258,11 +272,32 @@ const DataInputForm: React.FC<any> = (props) => {
     
       const responseData = await response.json();
       console.log(responseData);
-      setHistoryDetails(responseData[0].details);
+      // setHistoryDetails(responseData.map((item: { details: any; }) => item.details));
+
+      const processedData = responseData.map((item: { details: string; date: string; }) => {
+        const detailsArray = item.details.split("\r\n"); // Assuming details are split by "\r\n"
+        
+        const date = item.date; // Extract date from the details
+        const details = detailsArray.filter(line => !line.startsWith("Date:")).join("\r\n"); // Exclude date line from details
+  
+        return { date, details};
+      });
+  
+      console.log(processedData)
+      setHistoryDetails(processedData);
+
 
     } catch (error:any) {
         console.log("Login failed", error.message);
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const day = date.getUTCDate().toString().padStart(2, '0');
+    const month = date.toLocaleString('en-GB', { month: 'short' });
+    const year = date.getUTCFullYear();
+    return `${day} ${month} ${year}`;
   };
 
   const closeModal = () => {
@@ -506,15 +541,41 @@ const DataInputForm: React.FC<any> = (props) => {
         className="flex items-center justify-center"
       >
         <Box
-          className="fixed  flex items-top justify-center rounded-lg"
-          sx={{width: 600, height: 400, bgcolor: 'background.paper', border: '2px solid #000', boxShadow: 24,p:2,}}
+          className="fixed  flex items-top justify-center rounded-lg border-2 border-black overflow-y-auto font-sans font-medium text-sm text-slate-300 bg-slate-800"
+          sx={{width: 600, height: 400, bgcolor: 'background.paper', boxShadow: 24,p:2,}}
         >
           <div className="w-full">
             <Typography id="modal-modal-title" variant="h6" component="h2" className="mb-4">
               Patient History
             </Typography>
             <Typography id="modal-modal-description" className="mt-4">
-              {historyDetails}
+              {historyDetails.map((historyDetail, index) => (
+                <React.Fragment key={index}>
+                  {historyDetail.date ? (
+                    <>
+                      <strong>{formatDate(historyDetail.date)}</strong>
+                      <br />
+                    </>
+                  ) : (
+                    <>
+                    "Hi"
+                    <br />
+                    </> // Fallback text if date is not present
+                  )}
+                  {historyDetail.details? historyDetail.details.split('\r\n').map((line, lineIndex) => (
+                    <span key={lineIndex}>
+                      {line}
+                      <br />
+                    </span>
+                  ))
+                  :
+                  <>
+                  Hi
+                  </>
+                  }
+                  {index < historyDetails.length - 1 && <br />} {/* Add a break between details */}
+                </React.Fragment>
+              ))}
             </Typography>
           </div>
         </Box>
