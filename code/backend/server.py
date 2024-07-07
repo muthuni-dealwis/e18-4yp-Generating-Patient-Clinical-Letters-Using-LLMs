@@ -167,16 +167,16 @@ def get_patient_details():
 @app.route('/api/patientHistory',methods=['POST'])
 def getPatientHistory():
     data = request.json
-    name = data.get('patientname')
-    patient_id = data.get('patientID')
+    name = data.get('patient_name')
+    patient_id = data.get('patient_id')
 
     cursor = mydb.cursor(dictionary=True)
 
-    if name:
-        query = "SELECT * FROM history WHERE name = %s"
-        cursor.execute(query, (name,))
-    elif patient_id:
-        query = "SELECT details FROM history WHERE patient_id = %s"
+    # if name:
+    #     query = "SELECT * FROM history WHERE name = %s"
+    #     cursor.execute(query, (name,))
+    if patient_id:
+        query = "SELECT details, date FROM history WHERE patient_id = %s"
         cursor.execute(query, (patient_id,))
     else:
         return jsonify({'error': 'Invalid request'}), 400
@@ -187,8 +187,8 @@ def getPatientHistory():
 @app.route('/api/patientData',methods=['POST'])
 def getPatientData():
     data = request.json
-    patient_name = data.get('patientname')
-    patient_id = data.get('patientID')
+    patient_name = data.get('patient_name')
+    patient_id = data.get('patient_id')
 
     cursor = mydb.cursor(dictionary=True)
 
@@ -207,8 +207,8 @@ def getPatientData():
 @app.route('/api/addPatientData',methods=['POST'])
 def addPatientData():
     data = request.json
-    patient_name = data.get('patientname')
-    patient_id = data.get('patientID')
+    patient_name = data.get('patient_name')
+    patient_id = data.get('patient_id')
 
     cursor = mydb.cursor(dictionary=True)
 
