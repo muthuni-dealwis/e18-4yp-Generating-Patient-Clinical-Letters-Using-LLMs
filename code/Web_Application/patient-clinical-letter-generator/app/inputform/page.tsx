@@ -297,12 +297,13 @@ const DataInputForm: React.FC<any> = (props) => {
       const date = item.date;
       const details = detailsArray.filter(line => !line.startsWith("Date:")).join("\n");
   
-      setHistoryDetails(processedData);
+      
 
       return { date, details};
       });
   
       console.log("processedData:", processedData)
+      setHistoryDetails(processedData);
 
     
       
